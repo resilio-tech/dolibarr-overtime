@@ -1,0 +1,63 @@
+# Copyright (C) 2024 SuperAdmin
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Generic
+#
+
+# Module label 'ModuleOvertimeName'
+ModuleOvertimeName = Overtime
+# Module description 'ModuleOvertimeDesc'
+ModuleOvertimeDesc = Overtime description
+
+#
+# Admin page
+#
+OvertimeSetup = Overtime setup
+Settings = Settings
+OvertimeSetupPage = Overtime setup page
+OVERTIME_MYPARAM1 = My param 1
+OVERTIME_MYPARAM1Tooltip = My param 1 tooltip
+OVERTIME_MYPARAM2=My param 2
+OVERTIME_MYPARAM2Tooltip=My param 2 tooltip
+
+#
+# Index page
+#
+List_Overtime = List Overtime
+New_Overtime = New Overtime
+
+#
+# About page
+#
+About = About
+OvertimeAbout = About Overtime
+OvertimeAboutPage = Overtime about page
+Count_Overtime = Count
+Refund_Overtime = Refund
+Counted_Overtime = Counted
+Refunded_Overtime = Refunded
+
+#
+# Sample page
+#
+OvertimeArea = Home Overtime
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
