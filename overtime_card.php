@@ -207,6 +207,10 @@ if (empty($reshook)) {
 		$action = '';
 	}
 
+	if ($action == 'confirm_delete' && $confirm == 'yes') {
+		include_once './overtime_delete.php';
+	}
+
 	if ($action == 'update') {
 		include_once './overtime_update.php';
 	}
@@ -580,11 +584,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		if (empty($reshook)) {
 
 			// Back to draft
-			if ($object->status == $object::STATUS_VALIDATED) {
-				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
-			}
+//			if ($object->status == $object::STATUS_VALIDATED) {
+//				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
+//			}
 
-			print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=edit&token='.newToken(), '', $permissiontoadd);
+			if ($object->status == $object::STATUS_VALIDATED) {
+				print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit&token=' . newToken(), '', $permissiontoadd);
+			}
 
 			// Validate
 			if ($object->status == $object::STATUS_DRAFT) {
@@ -612,10 +618,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				}
 			}
 			*/
-
-			// Delete
-			$params = array();
-			print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=delete&token='.newToken(), 'delete', $permissiontodelete, $params);
+			if ($object->status == $object::STATUS_VALIDATED) {
+				// Delete
+				$params = array();
+				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken(), 'delete', $permissiontodelete, $params);
+			}
 		}
 		print '</div>'."\n";
 	}
