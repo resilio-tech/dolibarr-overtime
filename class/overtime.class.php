@@ -128,6 +128,7 @@ class Overtime extends CommonObject
 		'date_start' => array('type'=>'date', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>45, 'notnull'=>1, 'visible'=>1,),
 		'date_end' => array('type'=>'date', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>46, 'notnull'=>1, 'visible'=>1,),
 		'reason' => array('type'=>'text', 'label'=>'Reason', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>1, 'validate'=>'1',),
+		'fk_payment' => array('type'=> 'integer:AccountLine:compta/bank/class/account.class.php', 'label'=>'Payment', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>0, 'foreignkey'=>'rowid', 'csslist'=>'tdoverflowmax150',),
 	);
 	public $rowid;
 	public $ref;
@@ -141,6 +142,7 @@ class Overtime extends CommonObject
 	public $date_start;
 	public $date_end;
 	public $reason;
+	public $fk_payment;
 	// END MODULEBUILDER PROPERTIES
 
 

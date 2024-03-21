@@ -56,9 +56,11 @@ OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Extra field attribute code for normal hours 
 HoursKeeped = Hours keeped
 OVERTIME_DAY_TO_RESERVE_Empty = Overtime hours to reserve is empty ! Please fill it in the Overtime setup page
 OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Extra field attribute code for normal hours per day (reference) is empty ! Please fill it in the Overtime setup page
-OvertimeHoursKeepedAddToCP = Add overtime hours to CP
+OvertimeHoursKeepedAddToCP = Overtime Hours
 OVERTIME_HOLIDAY_TYPE = Holiday type
 OVERTIME_HOLIDAY_TYPE_Empty = Holiday type is empty ! Please fill it in the Overtime setup page
+Link_Overtime = Link Overtime to a refund
+
 #
 # Sample page
 #

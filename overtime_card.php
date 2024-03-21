@@ -78,6 +78,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 dol_include_once('/overtime/class/overtime.class.php');
 dol_include_once('/overtime/lib/overtime_overtime.lib.php');
+require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("overtime@overtime", "other"));
@@ -100,6 +101,7 @@ $backtopage = GETPOST('backtopage', 'alpha');					// if not set, a default page 
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');	// if not set, $backtopage will be used
 $backtopagejsfields = GETPOST('backtopagejsfields', 'alpha');
 $dol_openinpopup = GETPOST('dol_openinpopup', 'aZ09');
+$linked = GETPOST('linked', 'alpha');
 
 if (!empty($backtopagejsfields)) {
 	$tmpbacktopagejsfields = explode(':', $backtopagejsfields);
@@ -236,6 +238,7 @@ if (empty($reshook)) {
 			$object->setOvertimeCounted();
 			exit;
 		} else {
+			$error++;
 			if (!empty($hourskeep->errors)) {
 				setEventMessages(null, $hourskeep->errors, 'errors');
 			} else {
@@ -345,6 +348,21 @@ if (empty($reshook)) {
 				setEventMessages($object->error, null, 'errors');
 			}
 			$action = 'create';
+		}
+	}
+
+	if ($action == 'link' && !empty($linked)) {
+		$object->fk_payment = $linked;
+		$result = $object->update($user);
+
+		if (!$result) {
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		} else {
+			$action = 'view';
 		}
 	}
 }
@@ -738,6 +756,58 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 					print dolGetButtonAction('', $langs->trans('Count_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=count&token=' . newToken(), '', $permissiontochangestatus);
 					print dolGetButtonAction('', $langs->trans('Refund_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=refund&token=' . newToken(), '', $permissiontochangestatus);
 				}
+				if ($object->status == $object::STATUS_REMBOURSED && $action != 'link') {
+					// Reopen
+					print dolGetButtonAction('', $langs->trans('Link_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=link&token=' . newToken(), '', $permissiontochangestatus);
+				}
+				if ($object->status == $object::STATUS_REMBOURSED && $action == 'link') {
+					// print a form select for a payment
+					print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=link">';
+					print '<input type="hidden" name="token" value="'.newToken().'">';
+					print '<input type="hidden" name="action" value="linked">';
+					print '<input type="hidden" name="id" value="'.$object->id.'">';
+
+					$array_payments = array();
+
+					$bank_account = new Account($db);
+
+					$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'bank ORDER BY datec DESC LIMIT 10';
+					$resql = $db->query($sql);
+
+					while ($res = $db->fetch_object($resql)) {
+						$line = new AccountLine($db);
+						$line->fetch($res->rowid);
+
+						$bank_links = $bank_account->get_url($line->id);
+
+						$amount = $line->amount;
+						$value_date = new DateTime();
+						date_timestamp_set($value_date, $line->datev);
+						$value_date = $value_date->format('Y-m-d');
+						$name = $line->label;
+						preg_match('/\((.+)\)/i', $name, $reg);
+						if (!empty($reg[1]) && $langs->trans($reg[1]) != $reg[1]) {
+							$name = $langs->trans($reg[1]);
+							$type = 'salary';
+						} else {
+							if ($name == '(payment_salary)') {
+								$name = $langs->trans('SalaryPayment');
+								$type = 'salary';
+							} else {
+								$name = dol_escape_htmltag($name);
+							}
+						}
+
+						if (!empty($bank_links[1]['label'])) {
+							$name .= ' - '.$bank_links[1]['label'];
+						}
+
+						$name = '<a href="'.DOL_URL_ROOT.'/compta/bank/line.php?rowid='.((int) $line->id).'&save_lastsearch_values=1" title="'.dol_escape_htmltag($name, 1).'" class="classfortooltip" target="_blank">'.img_picto('', $line->picto).' '.$line->id.' '.$name.'</a>';
+
+						$array_payments[$line->id] = $name.' - '.$amount.' - '.$value_date;
+					}
+					print $form->selectMassAction('', $array_payments, 1, 'linked');
+				}
 			}
 
 			/*
@@ -772,37 +842,36 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	}
 
 	if ($action != 'presend') {
-		print '<div class="fichecenter"><div class="fichehalfleft">';
+		print '<div class="fichecenter">';
 		print '<a name="builddoc"></a>'; // ancre
 
-		$includedocgeneration = 0;
+		print '<div class="div-table-responsive-no-min">';
+		print '<table class="noborder allwidth" data-block="showLinkedObject" data-element="' . $object->element . '"  data-elementid="' . $object->id . '"   >';
 
-		// Documents
-		if ($includedocgeneration) {
-			$objref = dol_sanitizeFileName($object->ref);
-			$relativepath = $objref.'/'.$objref.'.pdf';
-			$filedir = $conf->overtime->dir_output.'/'.$object->element.'/'.$objref;
-			$urlsource = $_SERVER["PHP_SELF"]."?id=".$object->id;
-			$genallowed = $permissiontoread; // If you can read, you can build the PDF to read content
-			$delallowed = $permissiontoadd; // If you can create/edit, you can remove a file on card
-			print $formfile->showdocuments('overtime:Overtime', $object->element.'/'.$objref, $filedir, $urlsource, $genallowed, $delallowed, $object->model_pdf, 1, 0, 0, 28, 0, '', '', '', $langs->defaultlang);
+		print '<tr class="liste_titre">';
+		print '<td>' . $langs->trans("Type") . '</td>';
+		print '<td>' . $langs->trans("Ref") . '</td>';
+		print '<td class="center"></td>';
+		print '<td class="center">' . $langs->trans("Date") . '</td>';
+		print '<td></td>';
+		print '</tr>';
+
+		// Fetch linked objects
+		$linked_id = $object->fk_payment;
+		if ($linked_id > 0) {
+			$linked_object = new AccountLine($db);
+			$linked_object->fetch($linked_id);
+
+			// Show linked object
+			print '<tr>';
+			print '<td>' . $langs->trans("Payment") . '</td>';
+			print '<td>' . $linked_object->getNomUrl(1) . '</td>';
+			print '<td class="center"></td>';
+			print '<td class="center">' . dol_print_date($linked_object->datev, 'day') . '</td>';
+			print '<td></td>';
+			print '</tr>';
 		}
-
-		// Show links to link elements
-		$linktoelem = $form->showLinkToObjectBlock($object, null, array('overtime'));
-		$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
-
-
-		print '</div><div class="fichehalfright">';
-
-		$MAXEVENT = 10;
-
-		$morehtmlcenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/overtime/overtime_agenda.php', 1).'?id='.$object->id);
-
-		// List of actions on element
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
-		$formactions = new FormActions($db);
-		$somethingshown = $formactions->showactions($object, $object->element.'@'.$object->module, (is_object($object->thirdparty) ? $object->thirdparty->id : 0), 1, '', $MAXEVENT, '', $morehtmlcenter);
+		print '</table>';
 
 		print '</div></div>';
 	}

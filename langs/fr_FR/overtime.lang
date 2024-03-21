@@ -38,9 +38,11 @@ OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Code de l'attribut supplémentaire pour les 
 HoursKeeped = Heures conservées
 OVERTIME_DAY_TO_RESERVE_Empty = Heures retenues vide ! Remplir le paramètre dans la configuration
 OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence) vide ! Remplir le paramètre dans la configuration
-OvertimeHoursKeepedAddToCP = Ajout des heures supplémentaires
+OvertimeHoursKeepedAddToCP = Heures supplémentaires
 OVERTIME_HOLIDAY_TYPE = Type pour les heures supplémentaires
 OVERTIME_HOLIDAY_TYPE_Empty = Type pour les heures supplémentaires vide ! Remplir le paramètre dans la configuration
+Link_Overtime = Lien avec un remboursement
+
 #
 # Admin page
 #

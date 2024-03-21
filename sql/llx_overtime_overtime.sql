@@ -39,3 +39,7 @@ ADD COLUMN fk_user integer NOT NULL AFTER tms;
 -- Add field 'reason' to table 'llx_overtime_overtime'
 ALTER TABLE llx_overtime_overtime
 ADD COLUMN reason text NOT NULL;
+
+-- Add field 'fk_payment' to table 'llx_overtime_overtime'
+ALTER TABLE llx_overtime_overtime
+ADD COLUMN fk_payment integer NOT NULL AFTER reason;

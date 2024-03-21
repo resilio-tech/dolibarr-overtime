@@ -1291,23 +1291,21 @@ class OvertimeHoursKeep extends CommonObject
 
 		$soldeActuel = $holiday->getCpforUser($this->fk_user, $holiday_type);
 		$newSolde = ($soldeActuel + $days_to_add);
-		$label = $langs->trans("OvertimeHoursKeepedAddToCP");
+		$label = $langs->trans("OvertimeHoursKeepedAddToCP")." +".($days_to_add)." jours - ID".$overtime->id;
 
 		$r = $holiday->addLogCP($user->id, $this->fk_user, $label, $newSolde, $holiday_type);
-		if (!$r) {
+		if ($r <= 0) {
 			$this->error = $holiday->error;
 			$this->errors = $holiday->errors;
 			return 0;
 		}
 
 		$r = $holiday->updateSoldeCP($this->fk_user, $newSolde, $holiday_type);
-		if (!$r) {
+		if ($r <= 0) {
 			$this->error = $holiday->error;
 			$this->errors = $holiday->errors;
 			return 0;
 		}
-
-		$overtime->add_object_linked($holiday->element, $holiday->id, $user->id);
 
 		$this->update($user);
 
