@@ -1300,7 +1300,7 @@ class OvertimeHoursKeep extends CommonObject
 			return 0;
 		}
 
-		$r = $holiday->updateSoldeCP($this->fk_user, $days_to_add, $holiday_type);
+		$r = $holiday->updateSoldeCP($this->fk_user, $newSolde, $holiday_type);
 		if (!$r) {
 			$this->error = $holiday->error;
 			$this->errors = $holiday->errors;
