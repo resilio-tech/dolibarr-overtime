@@ -46,10 +46,17 @@ New_Overtime = New Overtime
 About = About
 OvertimeAbout = About Overtime
 OvertimeAboutPage = Overtime about page
-Count_Overtime = Count
-Refund_Overtime = Refund
+Count_Overtime = Count to day balance
+Refund_Overtime = Mark as Refunded
 Counted_Overtime = Counted
 Refunded_Overtime = Refunded
+List_OvertimeDayCounted = List hours Counted
+OVERTIME_DAY_TO_RESERVE = Overtime hours to reserve
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Extra field attribute code for normal hours per day (reference)
+HoursKeeped = Hours keeped
+OVERTIME_DAY_TO_RESERVE_Empty = Overtime hours to reserve is empty ! Please fill it in the Overtime setup page
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Extra field attribute code for normal hours per day (reference) is empty ! Please fill it in the Overtime setup page
+OvertimeHoursKeepedAddToCP = Add overtime hours to CP
 
 #
 # Sample page

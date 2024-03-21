@@ -28,10 +28,17 @@ ModuleMyModuleDesc = MyModule description
 Overtime = Heures supplémentaires
 List_Overtime = Liste des heures supplémentaires
 New_Overtime = Nouvelle heure supplémentaire
-Count_Overtime = Comptabiliser
-Refund_Overtime = Remboursement
+Count_Overtime = Comptabiliser sur le solde de jours
+Refund_Overtime = Marquer Remboursé
 Counted_Overtime = Comptabilisé
 Refunded_Overtime = Remboursé
+List_OvertimeDayCounted = Liste d'heures retenues
+OVERTIME_DAY_TO_RESERVE = Heures retenues
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence)
+HoursKeeped = Heures conservées
+OVERTIME_DAY_TO_RESERVE_Empty = Heures retenues vide ! Remplir le paramètre dans la configuration
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence) vide ! Remplir le paramètre dans la configuration
+OvertimeHoursKeepedAddToCP = Ajout des heures supplémentaires
 
 #
 # Admin page

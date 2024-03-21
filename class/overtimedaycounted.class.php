@@ -62,12 +62,7 @@ class OvertimeDayCounted extends CommonObject
 	/**
 	 * @var string String with name of icon for overtimedaycounted. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'overtimedaycounted@overtime' if picto is file 'img/object_overtimedaycounted.png'.
 	 */
-	public $picto = 'fa-file';
-
-
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_CANCELED = 9;
+	public $picto = 'fa-business-time';
 
 	/**
 	 *  'type' field format:
@@ -115,30 +110,21 @@ class OvertimeDayCounted extends CommonObject
 	public $fields=array(
 		"rowid" => array("type"=>"integer", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>1, 'notnull'=>1, "visible"=>"0", "noteditable"=>"1", "index"=>"1", "css"=>"left", "comment"=>"Id"),
 		"ref" => array("type"=>"varchar(128)", "label"=>"Ref", "enabled"=>"1", 'position'=>20, 'notnull'=>1, "visible"=>"1", "index"=>"1", "searchall"=>"1", "showoncombobox"=>"1", "validate"=>"1", "comment"=>"Reference of object"),
-		"label" => array("type"=>"varchar(255)", "label"=>"Label", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>"1", "alwayseditable"=>"1", "searchall"=>"1", "css"=>"minwidth300", "cssview"=>"wordbreak", "help"=>"Help text", "showoncombobox"=>"2", "validate"=>"1",),
-		"amount" => array("type"=>"price", "label"=>"Amount", "enabled"=>"1", 'position'=>40, 'notnull'=>0, "visible"=>"1", "default"=>"null", "isameasure"=>"1", "help"=>"Help text for amount", "validate"=>"1",),
-		"qty" => array("type"=>"real", "label"=>"Qty", "enabled"=>"1", 'position'=>45, 'notnull'=>0, "visible"=>"1", "default"=>"0", "isameasure"=>"1", "css"=>"maxwidth75imp", "help"=>"Help text for quantity", "validate"=>"1",),
-		"fk_soc" => array("type"=>"integer:Societe:societe/class/societe.class.php:1:((status:=:1) AND (entity:IN:__SHARED_ENTITIES__))", "label"=>"ThirdParty", "picto"=>"company", "enabled"=>"isModEnabled('societe')", 'position'=>50, 'notnull'=>-1, "visible"=>"1", "index"=>"1", "css"=>"maxwidth500 widthcentpercentminusxx", "csslist"=>"tdoverflowmax150", "help"=>"OrganizationEventLinkToThirdParty", "validate"=>"1",),
-		"fk_project" => array("type"=>"integer:Project:projet/class/project.class.php:1", "label"=>"Project", "picto"=>"project", "enabled"=>"isModEnabled('project')", 'position'=>52, 'notnull'=>-1, "visible"=>"-1", "index"=>"1", "css"=>"maxwidth500 widthcentpercentminusxx", "csslist"=>"tdoverflowmax150", "validate"=>"1",),
 		"description" => array("type"=>"text", "label"=>"Description", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"3", "validate"=>"1",),
 		"note_public" => array("type"=>"html", "label"=>"NotePublic", "enabled"=>"1", 'position'=>61, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
 		"note_private" => array("type"=>"html", "label"=>"NotePrivate", "enabled"=>"1", 'position'=>62, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
 		"date_creation" => array("type"=>"datetime", "label"=>"DateCreation", "enabled"=>"1", 'position'=>500, 'notnull'=>1, "visible"=>"-2",),
 		"tms" => array("type"=>"timestamp", "label"=>"DateModification", "enabled"=>"1", 'position'=>501, 'notnull'=>0, "visible"=>"-2",),
-		"fk_user_creat" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserAuthor", "picto"=>"user", "enabled"=>"1", 'position'=>510, 'notnull'=>1, "visible"=>"-2", "foreignkey"=>"0", "csslist"=>"tdoverflowmax150",),
+		"fk_user_creat" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserAuthor", "picto"=>"user", "enabled"=>"1", 'position'=>510, 'notnull'=>1, "visible"=>"-2", "csslist"=>"tdoverflowmax150",),
 		"fk_user_modif" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserModif", "picto"=>"user", "enabled"=>"1", 'position'=>511, 'notnull'=>-1, "visible"=>"-2", "csslist"=>"tdoverflowmax150",),
 		"last_main_doc" => array("type"=>"varchar(255)", "label"=>"LastMainDoc", "enabled"=>"1", 'position'=>600, 'notnull'=>0, "visible"=>"0",),
-		"import_key" => array("type"=>"varchar(14)", "label"=>"ImportId", "enabled"=>"1", 'position'=>1000, 'notnull'=>-1, "visible"=>"-2",),
-		"model_pdf" => array("type"=>"varchar(255)", "label"=>"Model pdf", "enabled"=>"1", 'position'=>1010, 'notnull'=>-1, "visible"=>"0",),
-		"status" => array("type"=>"integer", "label"=>"Status", "enabled"=>"1", 'position'=>2000, 'notnull'=>1, "visible"=>"1", "index"=>"1", "arrayofkeyval"=>array("0" => "Brouillon", "1" => "Valid&eacute;", "9" => "Annul&eacute;"), "validate"=>"1",),
+		"dayreserve" => array("type"=>"integer", "label"=>"Heures retenues", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
+		"fk_user" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"User", "enabled"=>"1", 'position'=>40, 'notnull'=>0, "visible"=>"1",),
+		"year" => array("type"=>"integer", "label"=>"year", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
 	);
 	public $rowid;
 	public $ref;
 	public $label;
-	public $amount;
-	public $qty;
-	public $fk_soc;
-	public $fk_project;
 	public $description;
 	public $note_public;
 	public $note_private;
@@ -149,7 +135,9 @@ class OvertimeDayCounted extends CommonObject
 	public $last_main_doc;
 	public $import_key;
 	public $model_pdf;
-	public $status;
+	public $dayreserve;
+	public $fk_user;
+	public $year;
 	// END MODULEBUILDER PROPERTIES
 
 
@@ -287,9 +275,6 @@ class OvertimeDayCounted extends CommonObject
 		}
 		if (property_exists($object, 'label')) {
 			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf")." ".$object->label : $this->fields['label']['default'];
-		}
-		if (property_exists($object, 'status')) {
-			$object->status = self::STATUS_DRAFT;
 		}
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();
@@ -522,11 +507,6 @@ class OvertimeDayCounted extends CommonObject
 	 */
 	public function deleteLine(User $user, $idline, $notrigger = false)
 	{
-		if ($this->status < 0) {
-			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
-			return -2;
-		}
-
 		return $this->deleteLineCommon($user, $idline, $notrigger);
 	}
 
@@ -545,12 +525,6 @@ class OvertimeDayCounted extends CommonObject
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 		$error = 0;
-
-		// Protection
-		if ($this->status == self::STATUS_VALIDATED) {
-			dol_syslog(get_class($this)."::validate action abandonned: already validated", LOG_WARNING);
-			return 0;
-		}
 
 		/* if (! ((!getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime', 'overtimedaycounted', 'write'))
 		 || (getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime', 'overtimedaycounted_advance', 'validate')))
@@ -575,8 +549,7 @@ class OvertimeDayCounted extends CommonObject
 		if (!empty($num)) {
 			// Validate
 			$sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element;
-			$sql .= " SET ref = '".$this->db->escape($num)."',";
-			$sql .= " status = ".self::STATUS_VALIDATED;
+			$sql .= " SET ref = '".$this->db->escape($num)."'";
 			if (!empty($this->fields['date_validation'])) {
 				$sql .= ", date_validation = '".$this->db->idate($now)."'";
 			}
@@ -651,7 +624,6 @@ class OvertimeDayCounted extends CommonObject
 		// Set new ref and current status
 		if (!$error) {
 			$this->ref = $num;
-			$this->status = self::STATUS_VALIDATED;
 		}
 
 		if (!$error) {
@@ -661,79 +633,6 @@ class OvertimeDayCounted extends CommonObject
 			$this->db->rollback();
 			return -1;
 		}
-	}
-
-
-	/**
-	 *	Set draft status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						Return integer <0 if KO, >0 if OK
-	 */
-	public function setDraft($user, $notrigger = 0)
-	{
-		// Protection
-		if ($this->status <= self::STATUS_DRAFT) {
-			return 0;
-		}
-
-		/* if (! ((!getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','write'))
-		 || (getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','overtime_advance','validate'))))
-		 {
-		 $this->error='Permission denied';
-		 return -1;
-		 }*/
-
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'OVERTIME_MYOBJECT_UNVALIDATE');
-	}
-
-	/**
-	 *	Set cancel status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						Return integer <0 if KO, 0=Nothing done, >0 if OK
-	 */
-	public function cancel($user, $notrigger = 0)
-	{
-		// Protection
-		if ($this->status != self::STATUS_VALIDATED) {
-			return 0;
-		}
-
-		/* if (! ((!getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','write'))
-		 || (getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','overtime_advance','validate'))))
-		 {
-		 $this->error='Permission denied';
-		 return -1;
-		 }*/
-
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'OVERTIME_MYOBJECT_CANCEL');
-	}
-
-	/**
-	 *	Set back to validated status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						Return integer <0 if KO, 0=Nothing done, >0 if OK
-	 */
-	public function reopen($user, $notrigger = 0)
-	{
-		// Protection
-		if ($this->status == self::STATUS_VALIDATED) {
-			return 0;
-		}
-
-		/*if (! ((!getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','write'))
-		 || (getDolGlobalInt('MAIN_USE_ADVANCED_PERMS') && $user->hasRight('overtime','overtime_advance','validate'))))
-		 {
-		 $this->error='Permission denied';
-		 return -1;
-		 }*/
-
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'OVERTIME_MYOBJECT_REOPEN');
 	}
 
 	/**
@@ -753,9 +652,6 @@ class OvertimeDayCounted extends CommonObject
 			return ['optimize' => $langs->trans("ShowOvertimeDayCounted")];
 		}
 		$datas['picto'] = img_picto('', $this->picto).' <u>'.$langs->trans("OvertimeDayCounted").'</u>';
-		if (isset($this->status)) {
-			$datas['picto'] .= ' '.$this->getLibStatut(5);
-		}
 		if (property_exists($this, 'ref')) {
 			$datas['ref'] = '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
 		}
@@ -929,63 +825,6 @@ class OvertimeDayCounted extends CommonObject
 		$return .= '</div>';
 
 		return $return;
-	}
-
-	/**
-	 *  Return the label of the status
-	 *
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return	string 			       Label of status
-	 */
-	public function getLabelStatus($mode = 0)
-	{
-		return $this->LibStatut($this->status, $mode);
-	}
-
-	/**
-	 *  Return the label of the status
-	 *
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return	string 			       Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->status, $mode);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *  Return the label of a given status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		if (is_null($status)) {
-			return '';
-		}
-
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-			//$langs->load("overtime@overtime");
-			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
-			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
-			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
-			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
-		}
-
-		$statusType = 'status'.$status;
-		//if ($status == self::STATUS_VALIDATED) $statusType = 'status1';
-		if ($status == self::STATUS_CANCELED) {
-			$statusType = 'status6';
-		}
-
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
 	/**
@@ -1202,6 +1041,21 @@ class OvertimeDayCounted extends CommonObject
 		dol_syslog(__METHOD__." end", LOG_INFO);
 
 		return $error;
+	}
+
+	public function fetchByUserAndYear($id, $year)
+	{
+		$sql = "SELECT rowid";
+		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
+		$sql .= " WHERE t.fk_user = ".((int) $id);
+		$sql .= " AND year = ".((int) $year);
+
+		$resql = $this->db->query($sql);
+		$obj = $this->db->fetch_object($resql);
+		if ($obj) {
+			return $this->fetch($obj->rowid);
+		}
+		return -1;
 	}
 }
 

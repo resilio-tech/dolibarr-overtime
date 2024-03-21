@@ -263,10 +263,31 @@ if (empty($reshook)) {
 
 	if ($permissiontochangestatus) {
 		if ($massaction == 'counted') {
+			require_once 'class/overtimehourskeep.class.php';
+
+			$hourskeep = new OvertimeHoursKeep($db);
+			$hourskeep->fetchByUser($object->fk_user);
+
 			foreach ($toselect as $s) {
 				$o = new Overtime($db);
 				$o->fetch($s);
+
+				$hourskeep->hourskeeped += $object->hours;
+
 				$o->setOvertimeCounted();
+			}
+
+			$result = $hourskeep->counted($user, $object);
+
+			if ($result > 0) {
+				header("Location: overtime_list.php");
+				exit;
+			} else {
+				if (!empty($hourskeep->errors)) {
+					setEventMessages(null, $hourskeep->errors, 'errors');
+				} else {
+					setEventMessages($hourskeep->error, null, 'errors');
+				}
 			}
 		}
 		if ($massaction == 'refund') {

@@ -222,15 +222,24 @@ if (empty($reshook)) {
 	}
 
 	if ($action == 'count' && $id > 0) {
-		$result = $object->setOvertimeCounted();
-		if ($result) {
+		require_once './class/overtimehourskeep.class.php';
+
+		$hourskeep = new OvertimeHoursKeep($db);
+		$hourskeep->fetchByUser($object->fk_user);
+
+		$hourskeep->hourskeeped += $object->hours;
+
+		$result = $hourskeep->counted($user, $object);
+
+		if ($result > 0) {
 			header("Location: overtime_list.php");
+			$object->setOvertimeCounted();
 			exit;
 		} else {
-			if (!empty($object->errors)) {
-				setEventMessages(null, $object->errors, 'errors');
+			if (!empty($hourskeep->errors)) {
+				setEventMessages(null, $hourskeep->errors, 'errors');
 			} else {
-				setEventMessages($object->error, null, 'errors');
+				setEventMessages($hourskeep->error, null, 'errors');
 			}
 		}
 	}
@@ -317,6 +326,11 @@ if (empty($reshook)) {
 		$db->begin();
 
 		$result = $object->create($user);
+
+		require_once './class/overtimehourskeep.class.php';
+
+		$overtimehourskeep = new OvertimeHoursKeep($db);
+		$overtimehourskeep->fetchByUser($user_id);
 
 		if ($result) {
 			$db->commit();

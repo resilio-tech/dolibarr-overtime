@@ -97,68 +97,63 @@ if (!class_exists('FormSetup')) {
 $formSetup = new FormSetup($db);
 
 
-// HTTP HOST
-$item = $formSetup->newItem('NO_PARAM_JUST_TEXT');
-$item->fieldOverride = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];
-$item->cssClass = 'minwidth500';
+//// HTTP HOST
+//$item = $formSetup->newItem('NO_PARAM_JUST_TEXT');
+//$item->fieldOverride = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];
+//$item->cssClass = 'minwidth500';
+//
+//// Setup conf OVERTIME_MYPARAM1 as a simple string input
+//$item = $formSetup->newItem('OVERTIME_MYPARAM1');
+//$item->defaultFieldValue = 'default value';
+//
+//// Setup conf OVERTIME_MYPARAM2 as a simple textarea input but we replace the text of field title
+//$item = $formSetup->newItem('OVERTIME_MYPARAM2');
+//$item->nameText = $item->getNameText().' more html text ';
+//
+//// Setup conf OVERTIME_MYPARAM3
+//$item = $formSetup->newItem('OVERTIME_MYPARAM3');
+//$item->setAsThirdpartyType();
+//
+//// Setup conf OVERTIME_MYPARAM4 : exemple of quick define write style
+//$formSetup->newItem('OVERTIME_MYPARAM4')->setAsYesNo();
+//
+//// Setup conf OVERTIME_MYPARAM5
+//$formSetup->newItem('OVERTIME_MYPARAM5')->setAsEmailTemplate('thirdparty');
+//
+//// Setup conf OVERTIME_MYPARAM6
+//$formSetup->newItem('OVERTIME_MYPARAM6')->setAsSecureKey()->enabled = 0; // disabled
+//
+//// Setup conf OVERTIME_MYPARAM7
+//$formSetup->newItem('OVERTIME_MYPARAM7')->setAsProduct();
+//
+//$formSetup->newItem('Title')->setAsTitle();
+//
+//// Setup conf OVERTIME_MYPARAM8
+//$item = $formSetup->newItem('OVERTIME_MYPARAM8');
+//$TField = array(
+//	'test01' => $langs->trans('test01'),
+//	'test02' => $langs->trans('test02'),
+//	'test03' => $langs->trans('test03'),
+//	'test04' => $langs->trans('test04'),
+//	'test05' => $langs->trans('test05'),
+//	'test06' => $langs->trans('test06'),
+//);
+//$item->setAsMultiSelect($TField);
+//$item->helpText = $langs->transnoentities('OVERTIME_MYPARAM8');
+//
+//
+//// Setup conf OVERTIME_MYPARAM9
+//$formSetup->newItem('OVERTIME_MYPARAM9')->setAsSelect($TField);
 
-// Setup conf OVERTIME_MYPARAM1 as a simple string input
-$item = $formSetup->newItem('OVERTIME_MYPARAM1');
-$item->defaultFieldValue = 'default value';
+$item = $formSetup->newItem('OVERTIME_DAY_TO_RESERVE');
+$item->defaultFieldValue = 0;
 
-// Setup conf OVERTIME_MYPARAM2 as a simple textarea input but we replace the text of field title
-$item = $formSetup->newItem('OVERTIME_MYPARAM2');
-$item->nameText = $item->getNameText().' more html text ';
-
-// Setup conf OVERTIME_MYPARAM3
-$item = $formSetup->newItem('OVERTIME_MYPARAM3');
-$item->setAsThirdpartyType();
-
-// Setup conf OVERTIME_MYPARAM4 : exemple of quick define write style
-$formSetup->newItem('OVERTIME_MYPARAM4')->setAsYesNo();
-
-// Setup conf OVERTIME_MYPARAM5
-$formSetup->newItem('OVERTIME_MYPARAM5')->setAsEmailTemplate('thirdparty');
-
-// Setup conf OVERTIME_MYPARAM6
-$formSetup->newItem('OVERTIME_MYPARAM6')->setAsSecureKey()->enabled = 0; // disabled
-
-// Setup conf OVERTIME_MYPARAM7
-$formSetup->newItem('OVERTIME_MYPARAM7')->setAsProduct();
-
-$formSetup->newItem('Title')->setAsTitle();
-
-// Setup conf OVERTIME_MYPARAM8
-$item = $formSetup->newItem('OVERTIME_MYPARAM8');
-$TField = array(
-	'test01' => $langs->trans('test01'),
-	'test02' => $langs->trans('test02'),
-	'test03' => $langs->trans('test03'),
-	'test04' => $langs->trans('test04'),
-	'test05' => $langs->trans('test05'),
-	'test06' => $langs->trans('test06'),
-);
-$item->setAsMultiSelect($TField);
-$item->helpText = $langs->transnoentities('OVERTIME_MYPARAM8');
-
-
-// Setup conf OVERTIME_MYPARAM9
-$formSetup->newItem('OVERTIME_MYPARAM9')->setAsSelect($TField);
-
-
-// Setup conf OVERTIME_MYPARAM10
-$item = $formSetup->newItem('OVERTIME_MYPARAM10');
-$item->setAsColor();
-$item->defaultFieldValue = '#FF0000';
-$item->nameText = $item->getNameText().' more html text ';
-$item->fieldInputOverride = '';
-$item->helpText = $langs->transnoentities('AnHelpMessage');
-//$item->fieldValue = '';
-//$item->fieldAttr = array() ; // fields attribute only for compatible fields like input text
-//$item->fieldOverride = false; // set this var to override field output will override $fieldInputOverride and $fieldOutputOverride too
-//$item->fieldInputOverride = false; // set this var to override field input
-//$item->fieldOutputOverride = false; // set this var to override field output
-
+$item = $formSetup->newItem('OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY');
+$item->setAsString();
+//
+//$item = $formSetup->newItem('OVERTIME_KEEP_HOURS_NOT_COUNTED');
+//$item->setAsYesNo();
+//$item->helpText = $langs->transnoentities('OVERTIME_KEEP_HOURS_NOT_COUNTED_HELP');
 
 $setupnotempty += count($formSetup->items);
 

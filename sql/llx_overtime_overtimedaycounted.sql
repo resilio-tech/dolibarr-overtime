@@ -18,12 +18,7 @@ CREATE TABLE llx_overtime_overtimedaycounted(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL, 
 	ref varchar(128) NOT NULL, 
-	label varchar(255), 
-	amount double DEFAULT NULL, 
-	qty real, 
-	fk_soc integer, 
-	fk_project integer, 
-	description text, 
+	description text,
 	note_public text, 
 	note_private text, 
 	date_creation datetime NOT NULL, 
@@ -31,8 +26,8 @@ CREATE TABLE llx_overtime_overtimedaycounted(
 	fk_user_creat integer NOT NULL, 
 	fk_user_modif integer, 
 	last_main_doc varchar(255), 
-	import_key varchar(14), 
-	model_pdf varchar(255), 
-	status integer NOT NULL
+	dayreserve integer,
+	fk_user integer, 
+	year integer
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
