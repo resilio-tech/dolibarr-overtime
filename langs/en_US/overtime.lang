@@ -60,6 +60,8 @@ OvertimeHoursKeepedAddToCP = Overtime Hours
 OVERTIME_HOLIDAY_TYPE = Holiday type
 OVERTIME_HOLIDAY_TYPE_Empty = Holiday type is empty ! Please fill it in the Overtime setup page
 Link_Overtime = Link Overtime to a refund
+Create_Link_Overtime = Create Link Overtime
+Linked_Overtime_Not_Set = Linked Overtime not set
 
 #
 # Sample page

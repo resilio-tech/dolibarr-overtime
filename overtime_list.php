@@ -828,6 +828,10 @@ while ($i < $imaxinloop) {
 				}
 				print '>';
 				if ($key == 'status') {
+					$linked_id = $object->fk_payment;
+					if (!$linked_id && $object->status == $object::STATUS_REMBOURSED) {
+						print img_picto($langs->trans('Linked_Overtime_Not_Set'), 'fa-exclamation-triangle', 'class="picto pictowarning pictowarning"');
+					}
 					print $object->getLibStatut(5);
 				} elseif ($key == 'rowid') {
 					print $object->showOutputField($val, $key, $object->id, '');

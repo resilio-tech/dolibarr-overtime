@@ -42,6 +42,8 @@ OvertimeHoursKeepedAddToCP = Heures supplémentaires
 OVERTIME_HOLIDAY_TYPE = Type pour les heures supplémentaires
 OVERTIME_HOLIDAY_TYPE_Empty = Type pour les heures supplémentaires vide ! Remplir le paramètre dans la configuration
 Link_Overtime = Lien avec un remboursement
+Create_Link_Overtime = Créer un remboursement
+Linked_Overtime_Not_Set = Lien avec un remboursement non défini
 
 #
 # Admin page

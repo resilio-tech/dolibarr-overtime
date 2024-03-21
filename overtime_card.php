@@ -252,7 +252,7 @@ if (empty($reshook)) {
 
 		$result = $object->delete($user);
 
-		if ($result) {
+		if ($result > 0) {
 			$db->commit();
 			header("Location: overtime_list.php");
 			exit;
@@ -279,7 +279,7 @@ if (empty($reshook)) {
 		$object->status = 0;
 		$result = $object->update($user);
 
-		if ($result) {
+		if ($result > 0) {
 			$db->commit();
 
 		} else {
@@ -301,7 +301,7 @@ if (empty($reshook)) {
 		$object->status = Overtime::STATUS_VALIDATED;
 		$result = $object->update($user);
 
-		if ($result) {
+		if ($result > 0) {
 			$db->commit();
 			header("Location: overtime_list.php");
 			exit;
@@ -335,7 +335,7 @@ if (empty($reshook)) {
 		$overtimehourskeep = new OvertimeHoursKeep($db);
 		$overtimehourskeep->fetchByUser($user_id);
 
-		if ($result) {
+		if ($result > 0) {
 			$db->commit();
 
 		} else {
@@ -355,7 +355,62 @@ if (empty($reshook)) {
 		$object->fk_payment = $linked;
 		$result = $object->update($user);
 
-		if (!$result) {
+		if ($result <= 0) {
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		} else {
+			$action = 'view';
+		}
+	}
+
+	if ($action == 'createlink') {
+		require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
+
+		$salary = new Salary($db);
+
+		$salary->fk_user = $object->fk_user;
+		$salary->datep = dol_now();
+		$salary->datev = dol_now();
+		$salary->datesp = $object->date_start;
+		$salary->dateep = $object->date_end;
+		$salary->amount = 0;
+		$salary->label = 'Heures supplémentaires';
+		$salary->type_payment = 0;
+
+		$r = $salary->create($user);
+		if ($r > 0) {
+			$object->fk_payment = $r;
+			$result = $object->update($user);
+			if ($result > 0) {
+				header("Location:/salaries/card.php?id=".$r);
+				exit;
+			} else {
+				$error++;
+				if (!empty($object->errors)) {
+					setEventMessages(null, $object->errors, 'errors');
+				} else {
+					setEventMessages($object->error, null, 'errors');
+				}
+			}
+		} else {
+			$error++;
+			if (!empty($salary->errors)) {
+				setEventMessages(null, $salary->errors, 'errors');
+			} else {
+				setEventMessages($salary->error, null, 'errors');
+			}
+		}
+	}
+
+	if ($action == 'unlink') {
+		$object->fk_payment = null;
+		$result = $object->update($user);
+
+		if ($result <= 0) {
+			$error++;
 			if (!empty($object->errors)) {
 				setEventMessages(null, $object->errors, 'errors');
 			} else {
@@ -759,6 +814,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				if ($object->status == $object::STATUS_REMBOURSED && $action != 'link') {
 					// Reopen
 					print dolGetButtonAction('', $langs->trans('Link_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=link&token=' . newToken(), '', $permissiontochangestatus);
+					print dolGetButtonAction('', $langs->trans('Create_Link_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=createlink&token=' . newToken(), '', $permissiontochangestatus);
 				}
 				if ($object->status == $object::STATUS_REMBOURSED && $action == 'link') {
 					// print a form select for a payment
@@ -769,21 +825,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 					$array_payments = array();
 
-					$bank_account = new Account($db);
-
-					$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'bank ORDER BY datec DESC LIMIT 10';
+					$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'salary ORDER BY datec DESC LIMIT 20';
 					$resql = $db->query($sql);
 
+					require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
+
 					while ($res = $db->fetch_object($resql)) {
-						$line = new AccountLine($db);
+						$line = new Salary($db);
 						$line->fetch($res->rowid);
 
-						$bank_links = $bank_account->get_url($line->id);
-
-						$amount = $line->amount;
-						$value_date = new DateTime();
-						date_timestamp_set($value_date, $line->datev);
-						$value_date = $value_date->format('Y-m-d');
+						$amount = floor($line->amount * 100) / 100;
+						$value_date = (new DateTime($line->datev))->format('Y-m-d');
 						$name = $line->label;
 						preg_match('/\((.+)\)/i', $name, $reg);
 						if (!empty($reg[1]) && $langs->trans($reg[1]) != $reg[1]) {
@@ -859,7 +911,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		// Fetch linked objects
 		$linked_id = $object->fk_payment;
 		if ($linked_id > 0) {
-			$linked_object = new AccountLine($db);
+			require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
+
+			$linked_object = new Salary($db);
 			$linked_object->fetch($linked_id);
 
 			// Show linked object
@@ -868,7 +922,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			print '<td>' . $linked_object->getNomUrl(1) . '</td>';
 			print '<td class="center"></td>';
 			print '<td class="center">' . dol_print_date($linked_object->datev, 'day') . '</td>';
-			print '<td></td>';
+			print '<td><a href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=unlink&token='.newToken().'">'.img_picto('Unlink', 'object_delete').'</a></td>';
 			print '</tr>';
 		}
 		print '</table>';
