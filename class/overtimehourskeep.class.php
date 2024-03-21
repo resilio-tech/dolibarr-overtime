@@ -1222,6 +1222,10 @@ class OvertimeHoursKeep extends CommonObject
 			return 0;
 		}
 
+		if (empty($conf->global->OVERTIME_HOLIDAY_TYPE)) {
+			$this->error = $langs->trans('OVERTIME_HOLIDAY_TYPE_Empty');
+		}
+
 		$key = $conf->global->OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY;
 		$sql = "SELECT ".$key;
 		$sql .= " FROM ".MAIN_DB_PREFIX."user_extrafields";
@@ -1283,19 +1287,20 @@ class OvertimeHoursKeep extends CommonObject
 
 		$holiday = new Holiday($this->db);
 		$holiday->fetchByUser($this->fk_user);
+		$holiday_type = $conf->global->OVERTIME_HOLIDAY_TYPE;
 
-		$soldeActuel = $holiday->getCpforUser($this->fk_user, $holiday->fk_type);
+		$soldeActuel = $holiday->getCpforUser($this->fk_user, $holiday_type);
 		$newSolde = ($soldeActuel + $days_to_add);
 		$label = $langs->trans("OvertimeHoursKeepedAddToCP");
 
-		$r = $holiday->addLogCP($user->id, $this->fk_user, $label, $newSolde, $holiday->fk_type);
+		$r = $holiday->addLogCP($user->id, $this->fk_user, $label, $newSolde, $holiday_type);
 		if (!$r) {
 			$this->error = $holiday->error;
 			$this->errors = $holiday->errors;
 			return 0;
 		}
 
-		$r = $holiday->updateSoldeCP($this->fk_user, $days_to_add, $holiday->fk_type);
+		$r = $holiday->updateSoldeCP($this->fk_user, $days_to_add, $holiday_type);
 		if (!$r) {
 			$this->error = $holiday->error;
 			$this->errors = $holiday->errors;

@@ -150,6 +150,21 @@ $item->defaultFieldValue = 0;
 
 $item = $formSetup->newItem('OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY');
 $item->setAsString();
+
+$item = $formSetup->newItem('OVERTIME_HOLIDAY_TYPE');
+$list_holiday_type = array(
+	'none' => '',
+);
+$sql = "SELECT rowid, label FROM ".MAIN_DB_PREFIX."c_holiday_types";
+$resql = $db->query($sql);
+if ($resql) {
+	while ($obj = $db->fetch_object($resql)) {
+		$list_holiday_type[$obj->rowid] = $obj->label;
+	}
+}
+$item->setAsSelect($list_holiday_type);
+$item->defaultFieldValue = 'none';
+
 //
 //$item = $formSetup->newItem('OVERTIME_KEEP_HOURS_NOT_COUNTED');
 //$item->setAsYesNo();
