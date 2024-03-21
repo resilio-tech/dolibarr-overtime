@@ -267,7 +267,7 @@ class Overtime extends CommonObject
 		$sql .= " ".((int) $this->fk_user).","; // fk_user
 		$sql .= " ".((int) $fuserid).","; // fk_user_creat
 		$sql .= " null,"; // fk_user_modif
-		$sql .= " ".self::STATUS_VALIDATED.","; // status
+		$sql .= " ".$this->status.","; // status
 		$sql .= " ".((float) $this->hours).","; // hours
 		$sql .= " '".$this->db->idate($this->date_start)."',"; // date_start
 		$sql .= " '".$this->db->idate($this->date_end)."',"; // date_end

@@ -25,6 +25,7 @@ ModuleOvertimeDesc = Overtime description
 #
 # Admin page
 #
+Overtime = Overtime
 OvertimeSetup = Overtime setup
 Settings = Settings
 OvertimeSetupPage = Overtime setup page

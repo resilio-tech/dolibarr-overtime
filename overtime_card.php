@@ -147,11 +147,11 @@ if ($enablepermissioncheck) {
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-	$permissiontodelete = 1;
+	$permissiontodelete = isset($object->status) && $object->status == $object::STATUS_DRAFT;
 	$permissionnote = 1;
 	$permissiondellink = 1;
 }
-
+$permissiontochangestatus = $user->hasRight('overtime', 'overtime', 'status');
 $upload_dir = $conf->overtime->multidir_output[isset($object->entity) ? $object->entity : 1].'/overtime';
 
 // Security check (enable the most restrictive one)
@@ -207,16 +207,131 @@ if (empty($reshook)) {
 		$action = '';
 	}
 
+	if ($action == 'refund' && $id > 0) {
+		$result = $object->setOvertimeRefunded();
+		if ($result) {
+			header("Location: overtime_list.php");
+			exit;
+		} else {
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
+	if ($action == 'count' && $id > 0) {
+		$result = $object->setOvertimeCounted();
+		if ($result) {
+			header("Location: overtime_list.php");
+			exit;
+		} else {
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		}
+	}
+
 	if ($action == 'confirm_delete' && $confirm == 'yes') {
-		include_once './overtime_delete.php';
+		$db->begin();
+
+		$result = $object->delete($user);
+
+		if ($result) {
+			$db->commit();
+			header("Location: overtime_list.php");
+			exit;
+		} else {
+			$db->rollback();
+
+			// Creation KO
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		}
 	}
 
 	if ($action == 'update') {
-		include_once './overtime_update.php';
+		$object->date_start = $date_start;
+		$object->date_end = $date_end;
+		$object->hours = $hours;
+		$object->reason = $reason;
+
+		$db->begin();
+
+		$object->status = 0;
+		$result = $object->update($user);
+
+		if ($result) {
+			$db->commit();
+
+		} else {
+			$db->rollback();
+
+			// Creation KO
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+			$action = 'edit';
+		}
+	}
+
+	if ($action == 'confirm_validate') {
+		$db->begin();
+
+		$object->status = Overtime::STATUS_VALIDATED;
+		$result = $object->update($user);
+
+		if ($result) {
+			$db->commit();
+			header("Location: overtime_list.php");
+			exit;
+		} else {
+			$db->rollback();
+
+			// Creation KO
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+		}
+
 	}
 
 	if ($action == 'add') {
-		include_once './overtime_add.php';
+		$object->date_start = $date_start;
+		$object->date_end = $date_end;
+		$object->hours = $hours;
+		$object->fk_user = $user_id;
+		$object->status = Overtime::STATUS_DRAFT;
+		$object->reason = $reason;
+
+		$db->begin();
+
+		$result = $object->create($user);
+
+		if ($result) {
+			$db->commit();
+
+		} else {
+			$db->rollback();
+
+			// Creation KO
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, null, 'errors');
+			}
+			$action = 'create';
+		}
 	}
 }
 
@@ -588,7 +703,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 //				print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=confirm_setdraft&confirm=yes&token='.newToken(), '', $permissiontoadd);
 //			}
 
-			if ($object->status == $object::STATUS_VALIDATED) {
+			if ($object->status == $object::STATUS_DRAFT) {
 				print dolGetButtonAction('', $langs->trans('Modify'), 'default', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit&token=' . newToken(), '', $permissiontoadd);
 			}
 
@@ -599,6 +714,15 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				} else {
 					$langs->load("errors");
 					print dolGetButtonAction($langs->trans("ErrorAddAtLeastOneLineFirst"), $langs->trans("Validate"), 'default', '#', '', 0);
+				}
+			}
+
+			// Status is Validated and user has permission to change status
+			if ($permissiontochangestatus) {
+				if ($object->status == $object::STATUS_VALIDATED) {
+					// Reopen
+					print dolGetButtonAction('', $langs->trans('Count_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=count&token=' . newToken(), '', $permissiontochangestatus);
+					print dolGetButtonAction('', $langs->trans('Refund_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=refund&token=' . newToken(), '', $permissiontochangestatus);
 				}
 			}
 
@@ -618,7 +742,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 				}
 			}
 			*/
-			if ($object->status == $object::STATUS_VALIDATED) {
+			if ($object->status == $object::STATUS_DRAFT) {
 				// Delete
 				$params = array();
 				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken(), 'delete', $permissiontodelete, $params);
