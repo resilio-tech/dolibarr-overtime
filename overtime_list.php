@@ -537,7 +537,7 @@ if (!empty($permissiontochangestatus)) {
 	$arrayofmassactions['counted'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Count_Overtime");
 	$arrayofmassactions['refund'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Refund_Overtime");
 }
-if (!empty($permissiontodelete)) {
+if (!empty($permissiontodelete) && ($object->status == $object::STATUS_DRAFT || $permissiontochangestatus && $object->status == $object::STATUS_VALIDATED)) {
 	$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
 }
 if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'predelete'))) {
