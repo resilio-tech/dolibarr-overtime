@@ -72,7 +72,7 @@ class modOvertime extends DolibarrModules
 		$this->editor_url = '';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated', 'experimental_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.4';
+		$this->version = '1.5';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -289,6 +289,12 @@ class modOvertime extends DolibarrModules
 		$this->rights[$r][4] = 'overtimedaycounted';
 		$this->rights[$r][5] = 'delete';
 		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 0 + 1);
+		$this->rights[$r][1] = 'Read OvertimeHoursKeep object of Overtime';
+		$this->rights[$r][4] = 'overtimehourskeep';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$r++;
 
 		/* END MODULEBUILDER PERMISSIONS */
 
@@ -369,6 +375,21 @@ class modOvertime extends DolibarrModules
             'position'=>1000+$r,
             'enabled'=>'isModEnabled("overtime")',
 			'perms'=>'$user->hasRight("overtime", "overtimedaycounted", "read")',
+            'target'=>'',
+            'user'=>2,
+        );
+		/*LEFTMENU OVERTIMEHOURSKEEP*/
+        $this->menu[$r++]=array(
+            'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=overtime',
+            'type'=>'left',
+            'titre'=>'List_OvertimeHoursKeep',
+            'mainmenu'=>'hrm',
+            'leftmenu'=>'overtime_overtimehourskeep_list',
+            'url'=>'/overtime/overtimehourskeep_list.php',
+            'langs'=>'overtime@overtime',
+            'position'=>1000+$r,
+            'enabled'=>'isModEnabled("overtime")',
+			'perms'=>'$user->hasRight("overtime", "overtimehourskeep", "read")',
             'target'=>'',
             'user'=>2,
         );

@@ -80,6 +80,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
 // load module libraries
 require_once __DIR__.'/class/overtime.class.php';
+require_once __DIR__.'/class/overtimehourskeep.class.php';
 
 // for other modules
 //dol_include_once('/othermodule/class/otherobject.class.php');
@@ -115,7 +116,7 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize technical objects
-$object = new Overtime($db);
+$object = new OvertimeHoursKeep($db);
 $extrafields = new ExtraFields($db);
 $diroutputmassaction = $conf->overtime->dir_output.'/temp/massgeneration/'.$user->id;
 $hookmanager->initHooks(array($contextpage)); 	// Note that conf->hooks_modules contains array of activated contexes
@@ -260,63 +261,6 @@ if (empty($reshook)) {
 	$objectlabel = 'Overtime';
 	$uploaddir = $conf->overtime->dir_output;
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
-
-	if ($permissiontochangestatus) {
-		if ($massaction == 'counted') {
-			require_once 'class/overtimehourskeep.class.php';
-
-			foreach ($toselect as $s) {
-				$o = new Overtime($db);
-				$o->fetch($s);
-
-				$hourskeep = new OvertimeHoursKeep($db);
-				$hourskeep->fetchByUser($o->fk_user);
-
-				$hourskeep->hourskeeped += $o->hours;
-
-				$result = $hourskeep->counted($user, $o);
-
-				if ($result > 0) {
-					$o->setOvertimeCounted();
-				} else {
-					if (!empty($hourskeep->errors)) {
-						setEventMessages(null, $hourskeep->errors, 'errors');
-					} else {
-						setEventMessages($hourskeep->error, null, 'errors');
-					}
-				}
-
-			}
-		}
-		if ($massaction == 'refund') {
-			foreach ($toselect as $s) {
-				$o = new Overtime($db);
-				$o->fetch($s);
-				$result = $o->setOvertimeRefunded();
-				if (!$result) {
-					if (!empty($o->errors)) {
-						setEventMessages(null, $o->errors, 'errors');
-					} else {
-						setEventMessages($o->error, null, 'errors');
-					}
-				}
-			}
-		}
-		if ($massaction == 'reverse') {
-			foreach ($toselect as $s) {
-				$o = new Overtime($db);
-				$o->fetch($s);
-				$result = $o->setOvertimeReverse();
-				if (!$result) {
-					if (!empty($o->errors)) {
-						setEventMessages(null, $o->errors, 'errors');
-					} else {
-						setEventMessages($o->error, null, 'errors');
-					}
-				}
-			}
-		}
-	}
 
 	// You can add more action here
 	// if ($action == 'xxx' && $permissiontoxxx) ...
@@ -552,14 +496,6 @@ $arrayofmassactions = array(
 	//'builddoc'=>img_picto('', 'pdf', 'class="pictofixedwidth"').$langs->trans("PDFMerge"),
 	//'presend'=>img_picto('', 'email', 'class="pictofixedwidth"').$langs->trans("SendByMail"),
 );
-if (!empty($permissiontochangestatus)) {
-	$arrayofmassactions['counted'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Count_Overtime");
-	$arrayofmassactions['refund'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Refund_Overtime");
-	$arrayofmassactions['reverse'] = img_picto('', '', 'class="pictofixedwidth"').$langs->trans("Reverse_Overtime");
-}
-if (!empty($permissiontodelete) && ($object->status == $object::STATUS_DRAFT || $permissiontochangestatus && $object->status == $object::STATUS_VALIDATED)) {
-	$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
-}
 if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'predelete'))) {
 	$arrayofmassactions = array();
 }
@@ -808,7 +744,7 @@ while ($i < $imaxinloop) {
 		print '<tr data-rowid="'.$object->id.'" class="oddeven">';
 
 		// Action column
-		if (getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN') && (!$object->isTreated() || $permissiontochangestatus)) {
+		if (getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN') && ($permissiontochangestatus)) {
 			print '<td class="nowrap center">';
 			if ($massactionbutton || $massaction) { // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 				$selected = 0;
@@ -847,13 +783,7 @@ while ($i < $imaxinloop) {
 					print ' title="'.dol_escape_htmltag($object->$key).'"';
 				}
 				print '>';
-				if ($key == 'status') {
-					$linked_id = $object->fk_payment;
-					if (!$linked_id && $object->status == $object::STATUS_REMBOURSED) {
-						print img_picto($langs->trans('Linked_Overtime_Not_Set'), 'fa-exclamation-triangle', 'class="picto pictowarning pictowarning"');
-					}
-					print $object->getLibStatut(5);
-				} elseif ($key == 'rowid') {
+				if ($key == 'rowid') {
 					print $object->showOutputField($val, $key, $object->id, '');
 				} else {
 					print $object->showOutputField($val, $key, $object->$key, '');
@@ -888,7 +818,7 @@ while ($i < $imaxinloop) {
 		}*/
 
 		// Action column
-		if (!getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN') && (!$object->isTreated() || $permissiontochangestatus)) {
+		if (!getDolGlobalString('MAIN_CHECKBOX_LEFT_COLUMN') && ($permissiontochangestatus)) {
 			print '<td class="nowrap center">';
 			if ($massactionbutton || $massaction) { // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
 				$selected = 0;

@@ -51,6 +51,7 @@ Refund_Overtime = Mark as Refunded
 Counted_Overtime = Counted
 Refunded_Overtime = Refunded
 List_OvertimeDayCounted = List hours Counted
+List_OvertimeHoursKeep = List hours Keeped
 OVERTIME_DAY_TO_RESERVE = Overtime hours to reserve
 OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Extra field attribute code for normal hours per day (reference)
 HoursKeeped = Hours keeped
@@ -62,6 +63,7 @@ OVERTIME_HOLIDAY_TYPE_Empty = Holiday type is empty ! Please fill it in the Over
 Link_Overtime = Link Overtime to a refund
 Create_Link_Overtime = Create Link Overtime
 Linked_Overtime_Not_Set = Linked Overtime not set
+Reverse_Overtime = Reverse to validate state
 
 #
 # Sample page

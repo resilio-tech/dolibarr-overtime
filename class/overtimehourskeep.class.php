@@ -110,8 +110,8 @@ class OvertimeHoursKeep extends CommonObject
 	 */
 	public $fields=array(
 		"rowid" => array("type"=>"integer", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>1, 'notnull'=>1, "visible"=>"0", "noteditable"=>"1", "index"=>"1", "css"=>"left", "comment"=>"Id"),
-		"label" => array("type"=>"varchar(255)", "label"=>"Label", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>"1", "alwayseditable"=>"1", "searchall"=>"1", "css"=>"minwidth300", "cssview"=>"wordbreak", "help"=>"Help text", "showoncombobox"=>"2", "validate"=>"1",),
-		"description" => array("type"=>"text", "label"=>"Description", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"3", "validate"=>"1",),
+		"label" => array("type"=>"varchar(255)", "label"=>"Label", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>"0", "alwayseditable"=>"1", "searchall"=>"1", "css"=>"minwidth300", "cssview"=>"wordbreak", "help"=>"Help text", "showoncombobox"=>"2", "validate"=>"1",),
+		"description" => array("type"=>"text", "label"=>"Description", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"0", "validate"=>"1",),
 		"note_public" => array("type"=>"html", "label"=>"NotePublic", "enabled"=>"1", 'position'=>61, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
 		"note_private" => array("type"=>"html", "label"=>"NotePrivate", "enabled"=>"1", 'position'=>62, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
 		"date_creation" => array("type"=>"datetime", "label"=>"DateCreation", "enabled"=>"1", 'position'=>500, 'notnull'=>1, "visible"=>"-2",),
@@ -120,7 +120,7 @@ class OvertimeHoursKeep extends CommonObject
 		"fk_user_modif" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserModif", "picto"=>"user", "enabled"=>"1", 'position'=>511, 'notnull'=>-1, "visible"=>"-2", "csslist"=>"tdoverflowmax150",),
 		"last_main_doc" => array("type"=>"varchar(255)", "label"=>"LastMainDoc", "enabled"=>"1", 'position'=>600, 'notnull'=>0, "visible"=>"0",),
 		"hourskeeped" => array("type"=>"integer", "label"=>"HoursKeeped", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
-		"fk_user" => array("type"=>"integer", "label"=>"User", "enabled"=>"1", 'position'=>40, 'notnull'=>1, "visible"=>"1",),
+		"fk_user" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"User", "enabled"=>"1", 'position'=>40, 'notnull'=>1, "visible"=>"1",),
 	);
 	public $rowid;
 	public $label;

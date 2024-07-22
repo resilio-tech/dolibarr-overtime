@@ -33,6 +33,7 @@ Refund_Overtime = Marquer Remboursé
 Counted_Overtime = Comptabilisé
 Refunded_Overtime = Remboursé
 List_OvertimeDayCounted = Liste d'heures retenues
+List_OvertimeHoursKeep = Liste d'heures conservées
 OVERTIME_DAY_TO_RESERVE = Heures retenues
 OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence)
 HoursKeeped = Heures conservées
@@ -44,6 +45,7 @@ OVERTIME_HOLIDAY_TYPE_Empty = Type pour les heures supplémentaires vide ! Rempl
 Link_Overtime = Lien avec un remboursement
 Create_Link_Overtime = Créer un remboursement
 Linked_Overtime_Not_Set = Lien avec un remboursement non défini
+Reverse_Overtime = Revenir sur l'état validé
 
 #
 # Admin page

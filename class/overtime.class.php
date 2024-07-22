@@ -1233,6 +1233,10 @@ class Overtime extends CommonObject
 		return $this->setOvertimeStatus(self::STATUS_REMBOURSED);
 	}
 
+	public function setOvertimeReverse() {
+		return $this->setOvertimeStatus(self::STATUS_VALIDATED);
+	}
+
 	public function isTreated()
 	{
 		return $this->status == self::STATUS_DECOMPTED || $this->status == self::STATUS_REMBOURSED;
