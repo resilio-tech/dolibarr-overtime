@@ -1003,7 +1003,13 @@ class Overtime extends CommonObject
 			$statusType = 'status6';
 		}
 
-		return dolGetStatus($this->labelStatus[$s], $this->labelStatusShort[$s], '', $statusType, $mode);
+		return dolGetStatus(
+			$this->labelStatus[$s],
+			$this->labelStatusShort[$s],
+			'',
+			$statusType,
+			$mode
+		);
 	}
 
 	/**
@@ -1216,7 +1222,6 @@ class Overtime extends CommonObject
 		if (!$resql) {
 			$this->error = $this->db->lasterror();
 			$this->db->rollback();
-			var_dump($this->error);
 			return -1;
 		}
 

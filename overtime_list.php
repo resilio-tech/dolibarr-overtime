@@ -97,9 +97,12 @@ $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : str
 $backtopage = GETPOST('backtopage', 'alpha'); // Go back to a dedicated page
 $optioncss  = GETPOST('optioncss', 'aZ'); // Option for the css output (always '' except when 'print')
 $mode       = GETPOST('mode', 'aZ'); // The output mode ('list', 'kanban', 'hierarchy', 'calendar', ...)
+$confirm_refunds = GETPOST('confirm_refunds', 'int');
+$refunds_confirm = GETPOST('refunds_confirm', 'int');
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
+$overtime_refunds = false;
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -301,6 +304,34 @@ if (empty($reshook)) {
 					}
 				}
 			}
+		}
+		if ($massaction == 'refunds') {
+			$overtime_refunds = true;
+		}
+		if ($confirm_refunds) {
+			foreach ($toselect as $s) {
+				$o = new Overtime($db);
+				$o->fetch($s);
+				$result = $o->setOvertimeRefunded();
+				if (!$result) {
+					if (!empty($o->errors)) {
+						setEventMessages(null, $o->errors, 'errors');
+					} else {
+						setEventMessages($o->error, null, 'errors');
+					}
+				}
+				$o->fetch($s);
+				$o->fk_payment = $refunds_confirm;
+				$result = $o->update($user);
+				if (!$result) {
+					if (!empty($o->errors)) {
+						setEventMessages(null, $o->errors, 'errors');
+					} else {
+						setEventMessages($o->error, null, 'errors');
+					}
+				}
+			}
+			$toselect = array();
 		}
 		if ($massaction == 'reverse') {
 			foreach ($toselect as $s) {
@@ -555,6 +586,7 @@ $arrayofmassactions = array(
 if (!empty($permissiontochangestatus)) {
 	$arrayofmassactions['counted'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Count_Overtime");
 	$arrayofmassactions['refund'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Refund_Overtime");
+	$arrayofmassactions['refunds'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Refunds_Overtime");
 	$arrayofmassactions['reverse'] = img_picto('', '', 'class="pictofixedwidth"').$langs->trans("Reverse_Overtime");
 }
 if (!empty($permissiontodelete) && ($object->status == $object::STATUS_DRAFT || $permissiontochangestatus && $object->status == $object::STATUS_VALIDATED)) {
@@ -594,6 +626,59 @@ $modelmail = "overtime";
 $objecttmp = new Overtime($db);
 $trackid = 'xxxx'.$object->id;
 include DOL_DOCUMENT_ROOT.'/core/tpl/massactions_pre.tpl.php';
+
+if ($overtime_refunds) {
+	$overtime_refunds_multi_users = array();
+	$overtime_refunds_salaries = array();
+	foreach ($toselect as $to_select) {
+		$to_o = new Overtime($db);
+		$to_o->fetch($to_select);
+		if (!empty($to_o->fk_user)) {
+			$overtime_refunds_multi_users[$to_o->fk_user] = $to_o->fk_user;
+
+			$salaries_sql = 'SELECT s.rowid, s.ref, s.datep, s.amount, s.label, s.fk_user FROM '.MAIN_DB_PREFIX.'salary as s WHERE s.fk_user = '.$to_o->fk_user.' ORDER BY s.datep DESC';
+			$resql_salaries = $db->query($salaries_sql);
+			if ($resql_salaries) {
+				$n = $db->num_rows($resql_salaries);
+				while ($n--) {
+					$s_obj = $db->fetch_object($resql_salaries);
+					$overtime_refunds_salaries[] = $s_obj;
+				}
+			}
+		}
+	}
+
+	print '<input type="hidden" name="confirm_refunds" value="1">';
+
+	print '<table class="valid centpercent">';
+	print '<tr class="validtitre"><td class="validtitre">';
+	print '<div>'.$langs->trans('Overtime_Refunds_Confirm').'</div>';
+	print '</td></tr>';
+
+	if (count($overtime_refunds_multi_users) > 1) {
+		print '<tr><td>';
+		print '<div>'.$langs->trans('Overtime_Refunds_Multi_Users').'</div>';
+		print '</td></tr>';
+	}
+
+	print '<tr><td>';
+	print '<select name="refunds_confirm" class="flat">';
+	print '<option value="">'.$langs->trans('None').'</option>';
+
+	foreach ($overtime_refunds_salaries as $salary) {
+		$u = new User($db);
+		$u->fetch($salary->fk_user);
+		$name = $u->firstname.' '.$u->lastname;
+		$label = $name.' ('.$salary->ref.') '. $salary->label .' '. price($salary->amount) . ' ' . dol_print_date($salary->datep, 'day');
+		print '<option value="'.$salary->rowid.'">'.$label.'</option>';
+	}
+
+	print '</select>';
+	print '</td><td>';
+	print '<input type="submit" class="button" value="'.$langs->trans('Confirm').'">';
+	print '</td></tr>';
+	print '</table><br>';
+}
 
 if ($search_all) {
 	$setupstring = '';
