@@ -642,7 +642,7 @@ if ($overtime_refunds) {
 				$n = $db->num_rows($resql_salaries);
 				while ($n--) {
 					$s_obj = $db->fetch_object($resql_salaries);
-					$overtime_refunds_salaries[] = $s_obj;
+					$overtime_refunds_salaries[$s_obj->rowid] = $s_obj;
 				}
 			}
 		}

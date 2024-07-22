@@ -921,7 +921,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			print '<td>' . $langs->trans("Payment") . '</td>';
 			print '<td>' . $linked_object->getNomUrl(1) . '</td>';
 			print '<td class="center"></td>';
-			print '<td class="center">' . dol_print_date($linked_object->datev, 'day') . '</td>';
+			print '<td class="center">' . dol_print_date($linked_object->datep, 'day') . '</td>';
 			print '<td><a href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=unlink&token='.newToken().'">'.img_picto('Unlink', 'object_delete').'</a></td>';
 			print '</tr>';
 		}
