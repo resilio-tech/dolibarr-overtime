@@ -17,13 +17,14 @@
 CREATE TABLE llx_overtime_overtime(
 	-- BEGIN MODULEBUILDER FIELDS
 	rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	date_creation datetime NOT NULL, 
-	tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
-	fk_user_creat integer NOT NULL, 
-	fk_user_modif integer, 
-	status integer NOT NULL, 
-	hours real NOT NULL, 
-	date_start date NOT NULL, 
+	entity integer DEFAULT 1 NOT NULL,
+	date_creation datetime NOT NULL,
+	tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	fk_user_creat integer NOT NULL,
+	fk_user_modif integer,
+	status integer NOT NULL,
+	hours real NOT NULL,
+	date_start date NOT NULL,
 	date_end date NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

@@ -52,7 +52,7 @@ class OvertimeDayCounted extends CommonObject
 	 * @var int  	Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -109,6 +109,7 @@ class OvertimeDayCounted extends CommonObject
 	 */
 	public $fields=array(
 		"rowid" => array("type"=>"integer", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>1, 'notnull'=>1, "visible"=>"0", "noteditable"=>"1", "index"=>"1", "css"=>"left", "comment"=>"Id"),
+		"entity" => array("type"=>"integer", "label"=>"Entity", "enabled"=>"1", 'position'=>5, 'notnull'=>1, "visible"=>"0", "default"=>"1", "index"=>"1"),
 		"ref" => array("type"=>"varchar(128)", "label"=>"Ref", "enabled"=>"1", 'position'=>20, 'notnull'=>1, "visible"=>"0", "index"=>"1", "searchall"=>"1", "showoncombobox"=>"1", "validate"=>"1", "comment"=>"Reference of object"),
 		"description" => array("type"=>"text", "label"=>"Description", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"3", "validate"=>"1",),
 		"note_public" => array("type"=>"html", "label"=>"NotePublic", "enabled"=>"1", 'position'=>61, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
@@ -123,6 +124,7 @@ class OvertimeDayCounted extends CommonObject
 		"year" => array("type"=>"integer", "label"=>"Year", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
 	);
 	public $rowid;
+	public $entity;
 	public $ref;
 	public $label;
 	public $description;
@@ -568,7 +570,7 @@ class OvertimeDayCounted extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('MYOBJECT_VALIDATE', $user);
+				$result = $this->call_trigger('OVERTIMEDAYCOUNTED_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -927,15 +929,15 @@ class OvertimeDayCounted extends CommonObject
 		global $langs, $conf;
 		$langs->load("overtime@overtime");
 
-		if (!getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
-			$conf->global->OVERTIME_MYOBJECT_ADDON = 'mod_overtimedaycounted_standard';
+		if (!getDolGlobalString('OVERTIME_OVERTIMEDAYCOUNTED_ADDON')) {
+			$conf->global->OVERTIME_OVERTIMEDAYCOUNTED_ADDON = 'mod_overtimedaycounted_standard';
 		}
 
-		if (getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
+		if (getDolGlobalString('OVERTIME_OVERTIMEDAYCOUNTED_ADDON')) {
 			$mybool = false;
 
-			$file = getDolGlobalString('OVERTIME_MYOBJECT_ADDON').".php";
-			$classname = getDolGlobalString('OVERTIME_MYOBJECT_ADDON');
+			$file = getDolGlobalString('OVERTIME_OVERTIMEDAYCOUNTED_ADDON').".php";
+			$classname = getDolGlobalString('OVERTIME_OVERTIMEDAYCOUNTED_ADDON');
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -997,8 +999,8 @@ class OvertimeDayCounted extends CommonObject
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (getDolGlobalString('MYOBJECT_ADDON_PDF')) {
-				$modele = getDolGlobalString('MYOBJECT_ADDON_PDF');
+			} elseif (getDolGlobalString('OVERTIMEDAYCOUNTED_ADDON_PDF')) {
+				$modele = getDolGlobalString('OVERTIMEDAYCOUNTED_ADDON_PDF');
 			}
 		}
 

@@ -30,10 +30,6 @@ function overtimeAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	// global $db;
-	// $extrafields = new ExtraFields($db);
-	// $extrafields->fetch_name_optionals_label('myobject');
-
 	$langs->load("overtime@overtime");
 
 	$h = 0;
@@ -43,17 +39,6 @@ function overtimeAdminPrepareHead()
 	$head[$h][1] = $langs->trans("Settings");
 	$head[$h][2] = 'settings';
 	$h++;
-
-	/*
-	$head[$h][0] = dol_buildpath("/overtime/admin/myobject_extrafields.php", 1);
-	$head[$h][1] = $langs->trans("ExtraFields");
-	$nbExtrafields = is_countable($extrafields->attributes['myobject']['label']) ? count($extrafields->attributes['myobject']['label']) : 0;
-	if ($nbExtrafields > 0) {
-		$head[$h][1] .= ' <span class="badge">' . $nbExtrafields . '</span>';
-	}
-	$head[$h][2] = 'myobject_extrafields';
-	$h++;
-	*/
 
 	$head[$h][0] = dol_buildpath("/overtime/admin/about.php", 1);
 	$head[$h][1] = $langs->trans("About");

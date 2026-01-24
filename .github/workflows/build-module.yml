@@ -1,0 +1,87 @@
+name: Build Dolibarr Module
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version override (leave empty to use module version)'
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from release
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [ -n "${{ github.event.release.tag_name }}" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION=$(grep -oP "\\\$this->version\s*=\s*'\K[^']+" core/modules/modOvertime.class.php)
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Module version: $VERSION"
+
+      - name: Update version in module file (for ZIP only)
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "Updating module version to: $VERSION"
+          sed -i "s/\$this->version = '[^']*';/\$this->version = '$VERSION';/" core/modules/modOvertime.class.php
+          grep "this->version" core/modules/modOvertime.class.php
+
+      - name: Create module package
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          MODULE_NAME="overtime"
+          PACKAGE_NAME="module_${MODULE_NAME}-${VERSION}"
+
+          mkdir -p "build_tmp/${MODULE_NAME}"
+
+          rsync -av --progress . "build_tmp/${MODULE_NAME}/" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='test' \
+            --exclude='build_tmp' \
+            --exclude='*.zip' \
+            --exclude='.tx' \
+            --exclude='modulebuilder.txt' \
+            --exclude='.editorconfig' \
+            --exclude='.gitattributes' \
+            --exclude='*.back'
+
+          cd build_tmp
+          zip -r "../${PACKAGE_NAME}.zip" "${MODULE_NAME}"
+          cd ..
+
+          rm -rf build_tmp
+
+          echo "Created package: ${PACKAGE_NAME}.zip"
+          ls -la "${PACKAGE_NAME}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module_overtime-${{ steps.version.outputs.version }}
+          path: module_overtime-${{ steps.version.outputs.version }}.zip
+          retention-days: 30
+
+      - name: Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: module_overtime-${{ steps.version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

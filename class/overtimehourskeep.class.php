@@ -53,7 +53,7 @@ class OvertimeHoursKeep extends CommonObject
 	 * @var int  	Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -110,6 +110,7 @@ class OvertimeHoursKeep extends CommonObject
 	 */
 	public $fields=array(
 		"rowid" => array("type"=>"integer", "label"=>"TechnicalID", "enabled"=>"1", 'position'=>1, 'notnull'=>1, "visible"=>"0", "noteditable"=>"1", "index"=>"1", "css"=>"left", "comment"=>"Id"),
+		"entity" => array("type"=>"integer", "label"=>"Entity", "enabled"=>"1", 'position'=>5, 'notnull'=>1, "visible"=>"0", "default"=>"1", "index"=>"1"),
 		"label" => array("type"=>"varchar(255)", "label"=>"Label", "enabled"=>"1", 'position'=>30, 'notnull'=>0, "visible"=>"0", "alwayseditable"=>"1", "searchall"=>"1", "css"=>"minwidth300", "cssview"=>"wordbreak", "help"=>"Help text", "showoncombobox"=>"2", "validate"=>"1",),
 		"description" => array("type"=>"text", "label"=>"Description", "enabled"=>"1", 'position'=>60, 'notnull'=>0, "visible"=>"0", "validate"=>"1",),
 		"note_public" => array("type"=>"html", "label"=>"NotePublic", "enabled"=>"1", 'position'=>61, 'notnull'=>0, "visible"=>"0", "cssview"=>"wordbreak", "validate"=>"1",),
@@ -123,6 +124,7 @@ class OvertimeHoursKeep extends CommonObject
 		"fk_user" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"User", "enabled"=>"1", 'position'=>40, 'notnull'=>1, "visible"=>"1",),
 	);
 	public $rowid;
+	public $entity;
 	public $label;
 	public $description;
 	public $note_public;
@@ -579,7 +581,7 @@ class OvertimeHoursKeep extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('MYOBJECT_VALIDATE', $user);
+				$result = $this->call_trigger('OVERTIMEHOURSKEEP_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -669,7 +671,7 @@ class OvertimeHoursKeep extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'OVERTIME_MYOBJECT_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'OVERTIMEHOURSKEEP_UNVALIDATE');
 	}
 
 	/**
@@ -693,7 +695,7 @@ class OvertimeHoursKeep extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'OVERTIME_MYOBJECT_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'OVERTIMEHOURSKEEP_CANCEL');
 	}
 
 	/**
@@ -717,7 +719,7 @@ class OvertimeHoursKeep extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'OVERTIME_MYOBJECT_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'OVERTIMEHOURSKEEP_REOPEN');
 	}
 
 	/**
@@ -1072,15 +1074,15 @@ class OvertimeHoursKeep extends CommonObject
 		global $langs, $conf;
 		$langs->load("overtime@overtime");
 
-		if (!getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
-			$conf->global->OVERTIME_MYOBJECT_ADDON = 'mod_overtimehourskeep_standard';
+		if (!getDolGlobalString('OVERTIME_OVERTIMEHOURSKEEP_ADDON')) {
+			$conf->global->OVERTIME_OVERTIMEHOURSKEEP_ADDON = 'mod_overtimehourskeep_standard';
 		}
 
-		if (getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
+		if (getDolGlobalString('OVERTIME_OVERTIMEHOURSKEEP_ADDON')) {
 			$mybool = false;
 
-			$file = getDolGlobalString('OVERTIME_MYOBJECT_ADDON').".php";
-			$classname = getDolGlobalString('OVERTIME_MYOBJECT_ADDON');
+			$file = getDolGlobalString('OVERTIME_OVERTIMEHOURSKEEP_ADDON').".php";
+			$classname = getDolGlobalString('OVERTIME_OVERTIMEHOURSKEEP_ADDON');
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1142,8 +1144,8 @@ class OvertimeHoursKeep extends CommonObject
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (getDolGlobalString('MYOBJECT_ADDON_PDF')) {
-				$modele = getDolGlobalString('MYOBJECT_ADDON_PDF');
+			} elseif (getDolGlobalString('OVERTIMEHOURSKEEP_ADDON_PDF')) {
+				$modele = getDolGlobalString('OVERTIMEHOURSKEEP_ADDON_PDF');
 			}
 		}
 
@@ -1212,12 +1214,7 @@ class OvertimeHoursKeep extends CommonObject
 	{
 		global $conf, $langs;
 
-		if (empty($conf->global->OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY)) {
-			$this->error = $langs->trans('OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty');
-			return 0;
-		}
-
-		if (empty($conf->global->OVERTIME_DAY_TO_RESERVE)) {
+		if (!isset($conf->global->OVERTIME_DAY_TO_RESERVE) || $conf->global->OVERTIME_DAY_TO_RESERVE === '') {
 			$this->error = $langs->trans('OVERTIME_DAY_TO_RESERVE_Empty');
 			return 0;
 		}
@@ -1226,18 +1223,67 @@ class OvertimeHoursKeep extends CommonObject
 			$this->error = $langs->trans('OVERTIME_HOLIDAY_TYPE_Empty');
 		}
 
-		$key = $conf->global->OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY;
-		$sql = "SELECT ".$key;
-		$sql .= " FROM ".MAIN_DB_PREFIX."user_extrafields";
-		$sql .= " WHERE fk_object = ".((int) $this->fk_user);
+		// Get hours per day: prefer native Dolibarr weeklyhours, fallback to extrafield
+		require_once 'HoursPerDayCalculator.class.php';
+		$calculator = new HoursPerDayCalculator();
 
-		$result = $this->db->query($sql);
-		$elem = $this->db->fetch_object($result);
-		if ($elem) {
-			$hours_per_day = (float) $elem->$key;
+		$hours_per_day = 0;
+		$use_native = !empty($conf->global->OVERTIME_USE_NATIVE_WEEKLYHOURS);
+
+		if ($use_native) {
+			// Use native Dolibarr weeklyhours field
+			$targetUser = new User($this->db);
+			$targetUser->fetch($this->fk_user);
+
+			if (!$calculator->isValidWeeklyHours($targetUser->weeklyhours)) {
+				$this->error = $langs->trans('OVERTIME_USER_WEEKLYHOURS_Empty', $this->fk_user);
+				return 0;
+			}
+
+			// Get days per week: from user extrafield or default
+			$days_per_week = !empty($conf->global->OVERTIME_DEFAULT_DAYS_PER_WEEK) ? (float) $conf->global->OVERTIME_DEFAULT_DAYS_PER_WEEK : 5;
+			$days_key = $conf->global->OVERTIME_KEY_FOR_DAYS_PER_WEEK;
+			if (!empty($days_key)) {
+				$sql = "SELECT ".$this->db->escape($days_key);
+				$sql .= " FROM ".MAIN_DB_PREFIX."user_extrafields";
+				$sql .= " WHERE fk_object = ".((int) $this->fk_user);
+				$result = $this->db->query($sql);
+				$elem = $this->db->fetch_object($result);
+				if ($elem && !empty($elem->$days_key) && $elem->$days_key > 0) {
+					$days_per_week = (float) $elem->$days_key;
+				}
+			}
+
+			$hours_per_day = $calculator->calculate($targetUser->weeklyhours, $days_per_week);
+			if ($hours_per_day === false) {
+				$this->error = $langs->trans('OVERTIME_HOURS_PER_DAY_Invalid');
+				return 0;
+			}
 		} else {
-			$this->error = "Error while fetching hours per day for user ".$user->id;
-			return 0;
+			// Legacy mode: use extrafield for hours per day
+			if (empty($conf->global->OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY)) {
+				$this->error = $langs->trans('OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty');
+				return 0;
+			}
+
+			$key = $conf->global->OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY;
+			$sql = "SELECT ".$this->db->escape($key);
+			$sql .= " FROM ".MAIN_DB_PREFIX."user_extrafields";
+			$sql .= " WHERE fk_object = ".((int) $this->fk_user);
+
+			$result = $this->db->query($sql);
+			$elem = $this->db->fetch_object($result);
+			if ($elem) {
+				$hours_per_day = (float) $elem->$key;
+			} else {
+				$this->error = "Error while fetching hours per day for user ".$user->id;
+				return 0;
+			}
+
+			if ($hours_per_day <= 0) {
+				$this->error = $langs->trans('OVERTIME_HOURS_PER_DAY_Invalid');
+				return 0;
+			}
 		}
 
 		$year = (int) date_timestamp_set(new DateTime(), $overtime->date_end)->format('Y');
@@ -1274,14 +1320,14 @@ class OvertimeHoursKeep extends CommonObject
 			$daycounted->update($user);
 		}
 
-		$days_to_add = (int) floor($this->hourskeeped / $hours_per_day);
+		$days_to_add = $calculator->calculateDaysFromOvertime($this->hourskeeped, $hours_per_day);
 
 		if ($days_to_add <= 0) {
 			$this->update($user);
 			return 1;
 		}
 
-		$this->hourskeeped -= $days_to_add * $hours_per_day;
+		$this->hourskeeped = $calculator->calculateRemainingHours($this->hourskeeped, $hours_per_day);
 
 		require_once DOL_DOCUMENT_ROOT.'/holiday/class/holiday.class.php';
 
