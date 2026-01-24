@@ -1,4 +1,4 @@
-# Copyright (C) ---Put here your own copyright and developer email---
+# Copyright (C) 2024 SuperAdmin
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 # Generic
 #
 
-# Module label 'ModuleMyModuleName'
-ModuleMyModuleName = MyModule
-# Module description 'ModuleMyModuleDesc'
-ModuleMyModuleDesc = MyModule description
+# Module label 'ModuleOvertimeName'
+ModuleOvertimeName = Heures supplémentaires
+# Module description 'ModuleOvertimeDesc'
+ModuleOvertimeDesc = Gestion des heures supplémentaires
 
 #
 # Index page
@@ -38,10 +38,17 @@ Refunded_Overtime = Remboursé
 List_OvertimeDayCounted = Liste d'heures retenues
 List_OvertimeHoursKeep = Liste d'heures conservées
 OVERTIME_DAY_TO_RESERVE = Heures retenues
-OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence)
+OVERTIME_USE_NATIVE_WEEKLYHOURS = Utiliser les heures hebdo natives de Dolibarr
+OVERTIME_USE_NATIVE_WEEKLYHOURSTooltip = Si activé, utilise le champ 'heures hebdomadaires' natif de Dolibarr au lieu d'un attribut supplémentaire
+OVERTIME_DEFAULT_DAYS_PER_WEEK = Jours par semaine par défaut
+OVERTIME_DEFAULT_DAYS_PER_WEEKTooltip = Valeur par défaut si l'attribut utilisateur n'est pas défini (généralement 5)
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Code de l'attribut supplémentaire pour les heures par jour (ancien)
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAYTooltip = Utilisé uniquement si 'Utiliser les heures hebdo natives' est désactivé
 HoursKeeped = Heures conservées
 OVERTIME_DAY_TO_RESERVE_Empty = Heures retenues vide ! Remplir le paramètre dans la configuration
-OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Code de l'attribut supplémentaire pour les heures par jour travaillé normaux (référence) vide ! Remplir le paramètre dans la configuration
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Code de l'attribut supplémentaire pour les heures par jour vide ! Remplir le paramètre dans la configuration
+OVERTIME_USER_WEEKLYHOURS_Empty = Heures hebdomadaires non configurées pour l'utilisateur %s ! Configurer dans les paramètres RH de l'utilisateur
+OVERTIME_HOURS_PER_DAY_Invalid = Valeur des heures par jour invalide (doit être positive)
 OvertimeHoursKeepedAddToCP = Heures supplémentaires
 OVERTIME_HOLIDAY_TYPE = Type pour les heures supplémentaires
 OVERTIME_HOLIDAY_TYPE_Empty = Type pour les heures supplémentaires vide ! Remplir le paramètre dans la configuration
@@ -53,30 +60,53 @@ Reverse_Overtime = Revenir sur l'état validé
 #
 # Admin page
 #
-MyModuleSetup = MyModule setup
-Settings = Settings
-MyModuleSetupPage = MyModule setup page
-MYMODULE_MYPARAM1 = My param 1
-MYMODULE_MYPARAM1Tooltip = My param 1 tooltip
-MYMODULE_MYPARAM2=My param 2
-MYMODULE_MYPARAM2Tooltip=My param 2 tooltip
-
+OvertimeSetup = Configuration des heures supplémentaires
+Settings = Paramètres
+OvertimeSetupPage = Page de configuration des heures supplémentaires
+OvertimeSetupHelp = Comment configurer le calcul des heures
+OvertimeSetupHelpText = <strong>Méthode 1 - Dolibarr natif (recommandé) :</strong><br>1. Activer "Utiliser les heures hebdo natives de Dolibarr"<br>2. Configurer les heures hebdomadaires pour chaque utilisateur dans son onglet RH (Utilisateurs > Fiche utilisateur > Onglet RH > Heures hebdomadaires)<br>3. Le module crée automatiquement un attribut supplémentaire "overtime_daysperweek" sur Utilisateurs pour les jours par semaine<br>4. Pour les employés à temps partiel, modifier la valeur de cet attribut dans leur fiche (défaut : 5 jours)<br><br><strong>Méthode 2 - Ancien mode (attribut pour heures par jour) :</strong><br>1. Désactiver "Utiliser les heures hebdo natives de Dolibarr"<br>2. Créer un attribut supplémentaire sur Utilisateurs pour "heures par jour"<br>3. Saisir le code de l'attribut dans "Code de l'attribut pour les heures par jour"<br><br><strong>Exemple :</strong> Utilisateur à 27h/semaine sur 3 jours = 9h/jour. Après 9h supplémentaires, il obtient 1 jour de congé.<br><br><strong>Attention :</strong> Le module crée l'attribut "overtime_daysperweek" automatiquement. Si vous avez déjà un attribut avec ce nom pour un autre usage, vous devrez ajuster votre configuration.
+OvertimeDaysPerWeek = Jours travaillés par semaine
+OvertimeDaysPerWeekHelp = Nombre de jours travaillés par semaine (utilisé pour calculer les heures par jour)
 
 #
 # About page
 #
-About = About
-MyModuleAbout = About MyModule
-MyModuleAboutPage = MyModule about page
+About = À propos
+OvertimeAbout = À propos des heures supplémentaires
+OvertimeAboutPage = Page à propos des heures supplémentaires
 
 #
 # Sample page
 #
-MyModuleArea = Home MyModule
-MyPageName = My page name
+OvertimeArea = Accueil heures supplémentaires
 
 #
-# Sample widget
+# Status
 #
-MyWidget = My widget
-MyWidgetDescription = My widget description
+OvertimeStatusDraft = Brouillon
+OvertimeStatusValidated = Validé
+OvertimeStatusDecompted = Décompté
+OvertimeStatusRemboursed = Remboursé
+OvertimeStatusCanceled = Annulé
+
+#
+# Permissions
+#
+PermOvertimeChangeStatus = Modifier le statut des heures supplémentaires
+PermOvertimeDayCountedRead = Consulter les jours comptabilisés
+PermOvertimeDayCountedWrite = Créer/modifier les jours comptabilisés
+PermOvertimeDayCountedDelete = Supprimer les jours comptabilisés
+PermOvertimeHoursKeepRead = Consulter les heures conservées
+
+#
+# Validation errors
+#
+DateStartRequired = La date de début est requise
+DateEndRequired = La date de fin est requise
+DateEndBeforeDateStart = La date de fin doit être après la date de début
+HoursRequired = Les heures sont requises
+HoursNotNumeric = Les heures doivent être un nombre
+HoursNegative = Les heures ne peuvent pas être négatives
+UserRequired = L'utilisateur est requis
+UserInvalid = Utilisateur invalide
+ReasonRequired = La raison est requise

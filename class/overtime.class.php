@@ -25,6 +25,7 @@
 
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
+dol_include_once('/overtime/class/OvertimeValidator.class.php');
 //require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
@@ -52,12 +53,12 @@ class Overtime extends CommonObject
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
-	public $ismultientitymanaged = 0;
+	public $ismultientitymanaged = 1;
 
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
 	 */
-	public $isextrafieldmanaged = 0;
+	public $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for overtime. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'overtime@overtime' if picto is file 'img/object_overtime.png'.
@@ -117,20 +118,22 @@ class Overtime extends CommonObject
 	 */
 	public $fields=array(
 		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'validate'=>'1'),
+		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>'1', 'position'=>5, 'notnull'=>1, 'visible'=>0, 'default'=>'1', 'index'=>1,),
+		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>'1', 'position'=>20, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'searchall'=>1, 'showoncombobox'=>'1', 'validate'=>'1',),
 		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
 		'fk_user' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'User', 'enabled'=>'1', 'position'=>505, 'notnull'=>1, 'visible'=>1, 'foreignkey'=>'user.rowid', 'csslist'=>'tdoverflowmax150',),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'picto'=>'user', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid', 'csslist'=>'tdoverflowmax150',),
 		'fk_user_modif' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'picto'=>'user', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2, 'csslist'=>'tdoverflowmax150',),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>2000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Brouillon', '1'=>'Validé', '4'=>'Décompté', '7'=>'Remboursé', '9'=>'Annulé'), 'validate'=>'1',),
-		'hours' => array('type'=>'real', 'label'=>'Hours', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1, 'default'=>'0', 'isameasure'=>'1', 'css'=>'maxwidth75imp', 'help'=>"Help text for quantity", 'validate'=>'1',),
+		'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>'1', 'position'=>2000, 'notnull'=>1, 'visible'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'OvertimeStatusDraft', '1'=>'OvertimeStatusValidated', '4'=>'OvertimeStatusDecompted', '7'=>'OvertimeStatusRemboursed', '9'=>'OvertimeStatusCanceled'), 'validate'=>'1',),
+		'hours' => array('type'=>'real', 'label'=>'Hours', 'enabled'=>'1', 'position'=>40, 'notnull'=>1, 'visible'=>1, 'default'=>'0', 'isameasure'=>'1', 'css'=>'maxwidth75imp', 'validate'=>'1',),
 		'date_start' => array('type'=>'date', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>45, 'notnull'=>1, 'visible'=>1,),
 		'date_end' => array('type'=>'date', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>46, 'notnull'=>1, 'visible'=>1,),
 		'reason' => array('type'=>'text', 'label'=>'Reason', 'enabled'=>'1', 'position'=>50, 'notnull'=>1, 'visible'=>1, 'validate'=>'1',),
 		'fk_payment' => array('type'=> 'integer:AccountLine:compta/bank/class/account.class.php', 'label'=>'Payment', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>0, 'foreignkey'=>'rowid', 'csslist'=>'tdoverflowmax150',),
 	);
 	public $rowid;
+	public $entity;
 	public $ref;
 	public $date_creation;
 	public $tms;
@@ -238,8 +241,19 @@ class Overtime extends CommonObject
 
 		$now = dol_now();
 
-		if (empty($this->date_start) || empty($this->date_end)) {
-			$this->error = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Date'));
+		// Validate data using OvertimeValidator
+		$validator = new OvertimeValidator();
+		$data = array(
+			'date_start' => $this->date_start,
+			'date_end' => $this->date_end,
+			'hours' => $this->hours,
+			'fk_user' => $this->fk_user,
+			'reason' => $this->reason
+		);
+
+		if (!$validator->validate($data)) {
+			$this->errors = $validator->getErrors();
+			$this->error = $langs->trans($validator->getErrors()[0]);
 			return -1;
 		}
 
@@ -251,6 +265,7 @@ class Overtime extends CommonObject
 		$this->db->begin();
 
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element." (";
+		$sql .= " entity,";
 		$sql .= " ref,";
 		$sql .= " date_creation,";
 		$sql .= " tms,";
@@ -263,6 +278,7 @@ class Overtime extends CommonObject
 		$sql .= " date_end,";
 		$sql .= " reason";
 		$sql .= ") VALUES (";
+		$sql .= " ".setEntity($this).","; // entity
 		$sql .= " '".$this->db->escape($this->ref)."',";
 		$sql .= " '".$this->db->idate($now)."',";
 		$sql .= " '".$this->db->idate($now)."',";
@@ -517,6 +533,24 @@ class Overtime extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
+		global $langs;
+
+		// Validate data using OvertimeValidator
+		$validator = new OvertimeValidator();
+		$data = array(
+			'date_start' => $this->date_start,
+			'date_end' => $this->date_end,
+			'hours' => $this->hours,
+			'fk_user' => $this->fk_user,
+			'reason' => $this->reason
+		);
+
+		if (!$validator->validate($data)) {
+			$this->errors = $validator->getErrors();
+			$this->error = $langs->trans($validator->getErrors()[0]);
+			return -1;
+		}
+
 		return $this->updateCommon($user, $notrigger);
 	}
 
@@ -616,7 +650,7 @@ class Overtime extends CommonObject
 
 			if (!$error && !$notrigger) {
 				// Call trigger
-				$result = $this->call_trigger('MYOBJECT_VALIDATE', $user);
+				$result = $this->call_trigger('OVERTIME_VALIDATE', $user);
 				if ($result < 0) {
 					$error++;
 				}
@@ -704,7 +738,7 @@ class Overtime extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'OVERTIME_MYOBJECT_UNVALIDATE');
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'OVERTIME_UNVALIDATE');
 	}
 
 	/**
@@ -728,7 +762,7 @@ class Overtime extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'OVERTIME_MYOBJECT_CANCEL');
+		return $this->setStatusCommon($user, self::STATUS_CANCELED, $notrigger, 'OVERTIME_CANCEL');
 	}
 
 	/**
@@ -752,7 +786,7 @@ class Overtime extends CommonObject
 		 return -1;
 		 }*/
 
-		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'OVERTIME_MYOBJECT_REOPEN');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'OVERTIME_REOPEN');
 	}
 
 	/**
@@ -1097,15 +1131,15 @@ class Overtime extends CommonObject
 		global $langs, $conf;
 		$langs->load("overtime@overtime");
 
-		if (!getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
-			$conf->global->OVERTIME_MYOBJECT_ADDON = 'mod_overtime_standard';
+		if (!getDolGlobalString('OVERTIME_OVERTIME_ADDON')) {
+			$conf->global->OVERTIME_OVERTIME_ADDON = 'mod_overtime_standard';
 		}
 
-		if (getDolGlobalString('OVERTIME_MYOBJECT_ADDON')) {
+		if (getDolGlobalString('OVERTIME_OVERTIME_ADDON')) {
 			$mybool = false;
 
-			$file = getDolGlobalString('OVERTIME_MYOBJECT_ADDON').".php";
-			$classname = getDolGlobalString('OVERTIME_MYOBJECT_ADDON');
+			$file = getDolGlobalString('OVERTIME_OVERTIME_ADDON').".php";
+			$classname = getDolGlobalString('OVERTIME_OVERTIME_ADDON');
 
 			// Include file with class
 			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
@@ -1167,8 +1201,8 @@ class Overtime extends CommonObject
 
 			if (!empty($this->model_pdf)) {
 				$modele = $this->model_pdf;
-			} elseif (getDolGlobalString('MYOBJECT_ADDON_PDF')) {
-				$modele = getDolGlobalString('MYOBJECT_ADDON_PDF');
+			} elseif (getDolGlobalString('OVERTIME_ADDON_PDF')) {
+				$modele = getDolGlobalString('OVERTIME_ADDON_PDF');
 			}
 		}
 

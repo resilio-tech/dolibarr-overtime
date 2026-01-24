@@ -28,6 +28,7 @@ CREATE TABLE llx_overtime_overtimedaycounted(
 	last_main_doc varchar(255), 
 	dayreserve integer,
 	fk_user integer, 
-	year integer
+	year integer,
+	entity integer DEFAULT 1 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;

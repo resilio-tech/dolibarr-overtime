@@ -29,10 +29,10 @@ Overtime = Overtime
 OvertimeSetup = Overtime setup
 Settings = Settings
 OvertimeSetupPage = Overtime setup page
-OVERTIME_MYPARAM1 = My param 1
-OVERTIME_MYPARAM1Tooltip = My param 1 tooltip
-OVERTIME_MYPARAM2=My param 2
-OVERTIME_MYPARAM2Tooltip=My param 2 tooltip
+OvertimeSetupHelp = How to configure hours calculation
+OvertimeSetupHelpText = <strong>Method 1 - Native Dolibarr (recommended):</strong><br>1. Enable "Use native Dolibarr weekly hours"<br>2. Configure weekly hours for each user in their HR tab (Users > User card > HR tab > Weekly hours)<br>3. The module automatically creates an extrafield "overtime_daysperweek" on Users for days per week<br>4. For part-time employees, edit this extrafield value in their user card (default: 5 days)<br><br><strong>Method 2 - Legacy (extrafield for hours per day):</strong><br>1. Disable "Use native Dolibarr weekly hours"<br>2. Create an extrafield on Users for "hours per day"<br>3. Enter the extrafield code in "Extra field attribute code for normal hours per day"<br><br><strong>Example:</strong> User with 27h/week over 3 days = 9h/day. After 9h overtime, they get 1 day off.<br><br><strong>Note:</strong> The module creates the extrafield "overtime_daysperweek" automatically. If you already have an extrafield with this name for another purpose, you may need to adjust your configuration.
+OvertimeDaysPerWeek = Working days per week
+OvertimeDaysPerWeekHelp = Number of days worked per week (used to calculate hours per day from weekly hours)
 
 #
 # Index page
@@ -56,10 +56,17 @@ Refunded_Overtime = Refunded
 List_OvertimeDayCounted = List hours Counted
 List_OvertimeHoursKeep = List hours Keeped
 OVERTIME_DAY_TO_RESERVE = Overtime hours to reserve
-OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Extra field attribute code for normal hours per day (reference)
+OVERTIME_USE_NATIVE_WEEKLYHOURS = Use native Dolibarr weekly hours
+OVERTIME_USE_NATIVE_WEEKLYHOURSTooltip = If enabled, uses the native Dolibarr 'weeklyhours' field from user settings instead of a custom extrafield
+OVERTIME_DEFAULT_DAYS_PER_WEEK = Default days per week
+OVERTIME_DEFAULT_DAYS_PER_WEEKTooltip = Default value if user extrafield is not set (typically 5)
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY = Extra field attribute code for normal hours per day (legacy)
+OVERTIME_DAY_KEY_FOR_HOUR_PER_DAYTooltip = Only used if 'Use native Dolibarr weekly hours' is disabled
 HoursKeeped = Hours keeped
 OVERTIME_DAY_TO_RESERVE_Empty = Overtime hours to reserve is empty ! Please fill it in the Overtime setup page
 OVERTIME_DAY_KEY_FOR_HOUR_PER_DAY_Empty = Extra field attribute code for normal hours per day (reference) is empty ! Please fill it in the Overtime setup page
+OVERTIME_USER_WEEKLYHOURS_Empty = Weekly hours not configured for user %s ! Please set it in the user HR settings
+OVERTIME_HOURS_PER_DAY_Invalid = Hours per day value is invalid (must be positive)
 OvertimeHoursKeepedAddToCP = Overtime Hours
 OVERTIME_HOLIDAY_TYPE = Holiday type
 OVERTIME_HOLIDAY_TYPE_Empty = Holiday type is empty ! Please fill it in the Overtime setup page
@@ -72,10 +79,34 @@ Reverse_Overtime = Reverse to validate state
 # Sample page
 #
 OvertimeArea = Home Overtime
-MyPageName = My page name
 
 #
-# Sample widget
+# Status
 #
-MyWidget = My widget
-MyWidgetDescription = My widget description
+OvertimeStatusDraft = Draft
+OvertimeStatusValidated = Validated
+OvertimeStatusDecompted = Counted
+OvertimeStatusRemboursed = Refunded
+OvertimeStatusCanceled = Canceled
+
+#
+# Permissions
+#
+PermOvertimeChangeStatus = Change overtime status
+PermOvertimeDayCountedRead = View counted days
+PermOvertimeDayCountedWrite = Create/modify counted days
+PermOvertimeDayCountedDelete = Delete counted days
+PermOvertimeHoursKeepRead = View kept hours
+
+#
+# Validation errors
+#
+DateStartRequired = Start date is required
+DateEndRequired = End date is required
+DateEndBeforeDateStart = End date must be after start date
+HoursRequired = Hours is required
+HoursNotNumeric = Hours must be a number
+HoursNegative = Hours cannot be negative
+UserRequired = User is required
+UserInvalid = Invalid user
+ReasonRequired = Reason is required
