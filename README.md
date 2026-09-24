@@ -19,7 +19,8 @@ Each year, the first hours counted for an employee go to a reserve and give neit
 
 ```
 DRAFT --> VALIDATED --> COUNTED     (converted into leave days)
-                    \-> REIMBURSED  (paid with the salary)
+  |           |     \-> REIMBURSED  (paid with the salary)
+  \-----------\-----> CANCELED     (refused)
 ```
 
 | Status | Meaning |
@@ -27,7 +28,8 @@ DRAFT --> VALIDATED --> COUNTED     (converted into leave days)
 | Draft | Declared by the employee, can still be edited or deleted |
 | Validated | Accepted by the manager, waiting to be settled |
 | Counted | Converted into leave days, final |
-| Reimbursed | Paid with the salary, final |
+| Reimbursed | Paid with the salary. Can be reversed to validated if the payment was a mistake |
+| Canceled | Refused, kept for the record |
 
 ---
 
@@ -59,7 +61,7 @@ Steps:
 
 1. Copy the `overtime` folder into `htdocs/custom/`
 2. Enable the module in **Setup > Modules > Human Resources**
-3. Open the module setup and save it once, even with the default values
+3. Choose the leave type to credit in the module setup
 
 ---
 
@@ -91,11 +93,14 @@ Permissions:
 
 | Permission | Allows |
 |------------|--------|
-| Change overtime status | Validate, count, reimburse and link payments |
+| Change overtime status | Count, reimburse, cancel and link payments |
+| See the overtime of all employees | See every overtime, not only the ones of the user's team |
 | View counted days | See the yearly reserves |
-| Create/modify counted days | Edit the yearly reserves |
+| Create/modify counted days | Correct the yearly reserves |
 | Delete counted days | Delete the yearly reserves |
 | View kept hours | See the pending hours |
+| Modify kept hours | Correct the pending hours |
+| Delete kept hours | Delete the pending hours |
 
 ---
 
