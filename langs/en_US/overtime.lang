@@ -93,6 +93,7 @@ OvertimeStatusCanceled = Canceled
 # Permissions
 #
 PermOvertimeChangeStatus = Change overtime status
+PermOvertimeReadAll = See the overtime of all employees
 PermOvertimeDayCountedRead = View counted days
 PermOvertimeDayCountedWrite = Create/modify counted days
 PermOvertimeDayCountedDelete = Delete counted days
