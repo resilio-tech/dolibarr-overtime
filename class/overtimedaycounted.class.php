@@ -119,7 +119,7 @@ class OvertimeDayCounted extends CommonObject
 		"fk_user_creat" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserAuthor", "picto"=>"user", "enabled"=>"1", 'position'=>510, 'notnull'=>1, "visible"=>"-2", "csslist"=>"tdoverflowmax150",),
 		"fk_user_modif" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"UserModif", "picto"=>"user", "enabled"=>"1", 'position'=>511, 'notnull'=>-1, "visible"=>"-2", "csslist"=>"tdoverflowmax150",),
 		"last_main_doc" => array("type"=>"varchar(255)", "label"=>"LastMainDoc", "enabled"=>"1", 'position'=>600, 'notnull'=>0, "visible"=>"0",),
-		"dayreserve" => array("type"=>"double", "label"=>"Heures retenues", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
+		"dayreserve" => array("type"=>"double", "label"=>"ReservedHours", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
 		"fk_user" => array("type"=>"integer:User:user/class/user.class.php", "label"=>"User", "enabled"=>"1", 'position'=>40, 'notnull'=>0, "visible"=>"1",),
 		"year" => array("type"=>"integer", "label"=>"Year", "enabled"=>"1", 'position'=>50, 'notnull'=>0, "visible"=>"1",),
 	);

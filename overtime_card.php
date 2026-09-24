@@ -285,6 +285,7 @@ if (empty($reshook)) {
 		$object->date_end = $date_end;
 		$object->hours = $hours;
 		$object->reason = $reason;
+		$extrafields->setOptionalsFromPost(null, $object);
 
 		$db->begin();
 
@@ -337,6 +338,7 @@ if (empty($reshook)) {
 		$object->fk_user = $user_id;
 		$object->status = Overtime::STATUS_DRAFT;
 		$object->reason = $reason;
+		$extrafields->setOptionalsFromPost(null, $object);
 
 		$db->begin();
 
@@ -535,6 +537,8 @@ if ($action == 'create') {
 	print '</td>';
 	print '</tr>';
 
+	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
+
 	print '</table>'."\n";
 
 	print dol_get_fiche_end();
@@ -596,6 +600,8 @@ if (($id || $ref) && $action == 'edit') {
 	print '<input type="text" name="reason" value="'.$object->reason.'">';
 	print '</td>';
 	print '</tr>';
+
+	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_edit.tpl.php';
 
 	print '</table>';
 

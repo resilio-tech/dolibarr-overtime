@@ -74,7 +74,7 @@ if (!isModEnabled('overtime')) {
 
 llxHeader("", $langs->trans("OvertimeArea"));
 
-print load_fiche_titre($langs->trans("OvertimeArea"), '', 'overtime.png@overtime');
+print load_fiche_titre($langs->trans("OvertimeArea"), '', 'fa-clock');
 
 print '<div class="fichecenter">';
 print '</div>';

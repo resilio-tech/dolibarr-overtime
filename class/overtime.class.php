@@ -312,6 +312,11 @@ class Overtime extends CommonObject
 			return -2;
 		}
 
+		if ($this->insertExtraFields() < 0) {
+			$this->db->rollback();
+			return -3;
+		}
+
 		$this->db->commit();
 
 		return $this->id;
