@@ -154,6 +154,7 @@ if ($enablepermissioncheck) {
 	$permissiondellink = 1;
 }
 $permissiontochangestatus = $user->hasRight('overtime', 'overtime', 'status');
+$permissiontolink = $permissiontochangestatus && isset($object->status) && $object->status == Overtime::STATUS_REMBOURSED;
 $upload_dir = $conf->overtime->multidir_output[isset($object->entity) ? $object->entity : 1].'/overtime';
 
 // Security check (enable the most restrictive one)
@@ -351,7 +352,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'link' && !empty($linked)) {
+	if ($action == 'link' && !empty($linked) && $permissiontolink) {
 		$object->fk_payment = $linked;
 		$result = $object->update($user);
 
@@ -366,7 +367,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'createlink') {
+	if ($action == 'createlink' && $permissiontolink) {
 		require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
 
 		$salary = new Salary($db);
@@ -385,7 +386,7 @@ if (empty($reshook)) {
 			$object->fk_payment = $r;
 			$result = $object->update($user);
 			if ($result > 0) {
-				header("Location:/salaries/card.php?id=".$r);
+				header("Location: ".DOL_URL_ROOT."/salaries/card.php?id=".$r);
 				exit;
 			} else {
 				$error++;
@@ -405,7 +406,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'unlink') {
+	if ($action == 'unlink' && $permissiontolink) {
 		$object->fk_payment = null;
 		$result = $object->update($user);
 
@@ -799,7 +800,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 					$array_payments = array();
 
-					$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'salary ORDER BY datec DESC LIMIT 20';
+					$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'salary WHERE fk_user = '.((int) $object->fk_user).' AND entity IN ('.getEntity('salary').') ORDER BY datec DESC LIMIT 20';
 					$resql = $db->query($sql);
 
 					require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
@@ -809,7 +810,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 						$line->fetch($res->rowid);
 
 						$amount = floor($line->amount * 100) / 100;
-						$value_date = (new DateTime($line->datev))->format('Y-m-d');
+						$value_date = dol_print_date($line->datev, 'day');
 						$name = $line->label;
 						preg_match('/\((.+)\)/i', $name, $reg);
 						if (!empty($reg[1]) && $langs->trans($reg[1]) != $reg[1]) {
@@ -828,7 +829,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 							$name .= ' - '.$bank_links[1]['label'];
 						}
 
-						$name = '<a href="'.DOL_URL_ROOT.'/compta/bank/line.php?rowid='.((int) $line->id).'&save_lastsearch_values=1" title="'.dol_escape_htmltag($name, 1).'" class="classfortooltip" target="_blank">'.img_picto('', $line->picto).' '.$line->id.' '.$name.'</a>';
+						$name = '<a href="'.DOL_URL_ROOT.'/salaries/card.php?id='.((int) $line->id).'" title="'.dol_escape_htmltag($name, 1).'" class="classfortooltip" target="_blank">'.img_picto('', $line->picto).' '.$line->id.' '.$name.'</a>';
 
 						$array_payments[$line->id] = $name.' - '.$amount.' - '.$value_date;
 					}
@@ -896,7 +897,11 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			print '<td>' . $linked_object->getNomUrl(1) . '</td>';
 			print '<td class="center"></td>';
 			print '<td class="center">' . dol_print_date($linked_object->datep, 'day') . '</td>';
-			print '<td><a href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=unlink&token='.newToken().'">'.img_picto('Unlink', 'object_delete').'</a></td>';
+			print '<td>';
+			if ($permissiontolink) {
+				print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=unlink&token='.newToken().'">'.img_picto('Unlink', 'object_delete').'</a>';
+			}
+			print '</td>';
 			print '</tr>';
 		}
 		print '</table>';

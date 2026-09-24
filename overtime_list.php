@@ -636,7 +636,7 @@ if ($overtime_refunds) {
 		if (!empty($to_o->fk_user)) {
 			$overtime_refunds_multi_users[$to_o->fk_user] = $to_o->fk_user;
 
-			$salaries_sql = 'SELECT s.rowid, s.ref, s.datep, s.amount, s.label, s.fk_user FROM '.MAIN_DB_PREFIX.'salary as s WHERE s.fk_user = '.$to_o->fk_user.' ORDER BY s.datep DESC';
+			$salaries_sql = 'SELECT s.rowid, s.ref, s.datep, s.amount, s.label, s.fk_user FROM '.MAIN_DB_PREFIX.'salary as s WHERE s.fk_user = '.((int) $to_o->fk_user).' AND s.entity IN ('.getEntity('salary').') ORDER BY s.datep DESC';
 			$resql_salaries = $db->query($salaries_sql);
 			if ($resql_salaries) {
 				$n = $db->num_rows($resql_salaries);
