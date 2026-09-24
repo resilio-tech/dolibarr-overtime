@@ -97,6 +97,8 @@ PermOvertimeDayCountedRead = Consulter les jours comptabilisés
 PermOvertimeDayCountedWrite = Créer/modifier les jours comptabilisés
 PermOvertimeDayCountedDelete = Supprimer les jours comptabilisés
 PermOvertimeHoursKeepRead = Consulter les heures conservées
+PermOvertimeHoursKeepWrite = Modifier les heures conservées
+PermOvertimeHoursKeepDelete = Supprimer les heures conservées
 
 #
 # Validation errors

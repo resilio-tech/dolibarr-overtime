@@ -97,6 +97,8 @@ PermOvertimeDayCountedRead = View counted days
 PermOvertimeDayCountedWrite = Create/modify counted days
 PermOvertimeDayCountedDelete = Delete counted days
 PermOvertimeHoursKeepRead = View kept hours
+PermOvertimeHoursKeepWrite = Modify kept hours
+PermOvertimeHoursKeepDelete = Delete kept hours
 
 #
 # Validation errors

@@ -427,7 +427,7 @@ $num = $db->num_rows($resql);
 if ($num == 1 && getDolGlobalInt('MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE') && $search_all && !$page) {
 	$obj = $db->fetch_object($resql);
 	$id = $obj->rowid;
-	header("Location: ".dol_buildpath('/overtime/overtime_card.php', 1).'?id='.((int) $id));
+	header("Location: ".dol_buildpath('/overtime/overtimehourskeep_card.php', 1).'?id='.((int) $id));
 	exit;
 }
 
@@ -785,6 +785,8 @@ while ($i < $imaxinloop) {
 				print '>';
 				if ($key == 'rowid') {
 					print $object->showOutputField($val, $key, $object->id, '');
+				} elseif ($key == 'hourskeeped') {
+					print '<a href="'.dol_buildpath('/overtime/overtimehourskeep_card.php', 1).'?id='.$object->id.'">'.$object->showOutputField($val, $key, $object->$key, '').'</a>';
 				} else {
 					print $object->showOutputField($val, $key, $object->$key, '');
 				}
