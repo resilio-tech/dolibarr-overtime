@@ -209,9 +209,9 @@ if (empty($reshook)) {
 		$action = '';
 	}
 
-	if ($action == 'refund' && $id > 0) {
+	if ($action == 'refund' && $id > 0 && $permissiontochangestatus && $object->status == Overtime::STATUS_VALIDATED) {
 		$result = $object->setOvertimeRefunded();
-		if ($result) {
+		if ($result > 0) {
 			header("Location: overtime_list.php");
 			exit;
 		} else {
@@ -223,8 +223,10 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'count' && $id > 0) {
+	if ($action == 'count' && $id > 0 && $permissiontochangestatus && $object->status == Overtime::STATUS_VALIDATED) {
 		require_once './class/overtimehourskeep.class.php';
+
+		$db->begin();
 
 		$hourskeep = new OvertimeHoursKeep($db);
 		$hourskeep->fetchByUser($object->fk_user);
@@ -232,17 +234,24 @@ if (empty($reshook)) {
 		$hourskeep->hourskeeped += $object->hours;
 
 		$result = $hourskeep->counted($user, $object);
+		if ($result > 0) {
+			$result = $object->setOvertimeCounted();
+		} else {
+			$object->error = $hourskeep->error;
+			$object->errors = $hourskeep->errors;
+		}
 
 		if ($result > 0) {
+			$db->commit();
 			header("Location: overtime_list.php");
-			$object->setOvertimeCounted();
 			exit;
 		} else {
+			$db->rollback();
 			$error++;
-			if (!empty($hourskeep->errors)) {
-				setEventMessages(null, $hourskeep->errors, 'errors');
+			if (!empty($object->errors)) {
+				setEventMessages(null, $object->errors, 'errors');
 			} else {
-				setEventMessages($hourskeep->error, null, 'errors');
+				setEventMessages($object->error, null, 'errors');
 			}
 		}
 	}
@@ -295,7 +304,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'confirm_validate') {
+	if ($action == 'confirm_validate' && $object->status == Overtime::STATUS_DRAFT) {
 		$db->begin();
 
 		$object->status = Overtime::STATUS_VALIDATED;

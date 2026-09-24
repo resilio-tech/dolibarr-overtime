@@ -271,6 +271,11 @@ if (empty($reshook)) {
 			foreach ($toselect as $s) {
 				$o = new Overtime($db);
 				$o->fetch($s);
+				if ($o->status != Overtime::STATUS_VALIDATED) {
+					continue;
+				}
+
+				$db->begin();
 
 				$hourskeep = new OvertimeHoursKeep($db);
 				$hourskeep->fetchByUser($o->fk_user);
@@ -278,25 +283,34 @@ if (empty($reshook)) {
 				$hourskeep->hourskeeped += $o->hours;
 
 				$result = $hourskeep->counted($user, $o);
-
 				if ($result > 0) {
-					$o->setOvertimeCounted();
+					$result = $o->setOvertimeCounted();
 				} else {
-					if (!empty($hourskeep->errors)) {
-						setEventMessages(null, $hourskeep->errors, 'errors');
-					} else {
-						setEventMessages($hourskeep->error, null, 'errors');
-					}
+					$o->error = $hourskeep->error;
+					$o->errors = $hourskeep->errors;
 				}
 
+				if ($result > 0) {
+					$db->commit();
+				} else {
+					$db->rollback();
+					if (!empty($o->errors)) {
+						setEventMessages(null, $o->errors, 'errors');
+					} else {
+						setEventMessages($o->error, null, 'errors');
+					}
+				}
 			}
 		}
 		if ($massaction == 'refund') {
 			foreach ($toselect as $s) {
 				$o = new Overtime($db);
 				$o->fetch($s);
+				if ($o->status != Overtime::STATUS_VALIDATED) {
+					continue;
+				}
 				$result = $o->setOvertimeRefunded();
-				if (!$result) {
+				if ($result < 0) {
 					if (!empty($o->errors)) {
 						setEventMessages(null, $o->errors, 'errors');
 					} else {
@@ -312,18 +326,22 @@ if (empty($reshook)) {
 			foreach ($toselect as $s) {
 				$o = new Overtime($db);
 				$o->fetch($s);
+				if ($o->status != Overtime::STATUS_VALIDATED) {
+					continue;
+				}
 				$result = $o->setOvertimeRefunded();
-				if (!$result) {
+				if ($result < 0) {
 					if (!empty($o->errors)) {
 						setEventMessages(null, $o->errors, 'errors');
 					} else {
 						setEventMessages($o->error, null, 'errors');
 					}
+					continue;
 				}
 				$o->fetch($s);
 				$o->fk_payment = $refunds_confirm;
 				$result = $o->update($user);
-				if (!$result) {
+				if ($result < 0) {
 					if (!empty($o->errors)) {
 						setEventMessages(null, $o->errors, 'errors');
 					} else {
@@ -337,8 +355,11 @@ if (empty($reshook)) {
 			foreach ($toselect as $s) {
 				$o = new Overtime($db);
 				$o->fetch($s);
+				if ($o->status != Overtime::STATUS_REMBOURSED) {
+					continue;
+				}
 				$result = $o->setOvertimeReverse();
-				if (!$result) {
+				if ($result < 0) {
 					if (!empty($o->errors)) {
 						setEventMessages(null, $o->errors, 'errors');
 					} else {
