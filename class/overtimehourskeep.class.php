@@ -1192,11 +1192,12 @@ class OvertimeHoursKeep extends CommonObject
 
 	public function fetchByUser($user_id)
 	{
-		global $user;
+		global $conf, $user;
 
 		$sql = "SELECT rowid";
 		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element;
 		$sql .= " WHERE fk_user = ".((int) $user_id);
+		$sql .= " AND entity = ".((int) $conf->entity);
 		$sql .= " ORDER BY rowid";
 		$result = $this->db->query($sql);
 		$elem = $this->db->fetch_object($result);

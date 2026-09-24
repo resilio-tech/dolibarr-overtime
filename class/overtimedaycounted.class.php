@@ -1047,10 +1047,13 @@ class OvertimeDayCounted extends CommonObject
 
 	public function fetchByUserAndYear($id, $year)
 	{
+		global $conf;
+
 		$sql = "SELECT rowid";
 		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
 		$sql .= " WHERE t.fk_user = ".((int) $id);
 		$sql .= " AND year = ".((int) $year);
+		$sql .= " AND t.entity = ".((int) $conf->entity);
 
 		$resql = $this->db->query($sql);
 		$obj = $this->db->fetch_object($resql);
