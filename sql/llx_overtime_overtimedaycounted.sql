@@ -32,3 +32,5 @@ CREATE TABLE llx_overtime_overtimedaycounted(
 	entity integer DEFAULT 1 NOT NULL
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
+
+ALTER TABLE llx_overtime_overtimedaycounted MODIFY dayreserve double;
