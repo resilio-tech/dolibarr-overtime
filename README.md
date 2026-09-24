@@ -1,158 +1,120 @@
 # Overtime - Dolibarr Module
 
-HR module for overtime management. Allows entering, validating and tracking employee overtime hours.
+Track the overtime worked by employees and settle it, either as leave days or as pay.
 
-## Features
+## Goal
 
-- Overtime entry per employee
-- Validation workflow (Draft → Validated → Counted → Reimbursed)
-- Automatic hour accumulation per employee
-- Overtime day counting
-- Extrafields support
-- Functional tests included
+An employee declares the overtime they worked. A manager validates it, then settles it in one of two ways:
+
+- **Counted**: the hours are converted into leave days, added to the employee's leave balance in the Dolibarr Leave module
+- **Reimbursed**: the hours are paid with the salary. The overtime is linked to the salary payment
+
+The two ways are alternatives: an overtime is either counted or reimbursed, never both.
+
+Each year, the first hours counted for an employee go to a reserve and give neither leave nor pay. They are the overtime already included in the employment contract. The size of this reserve is set in the module setup.
+
+---
+
+## Workflow
+
+```
+DRAFT --> VALIDATED --> COUNTED     (converted into leave days)
+                    \-> REIMBURSED  (paid with the salary)
+```
+
+| Status | Meaning |
+|--------|---------|
+| Draft | Declared by the employee, can still be edited or deleted |
+| Validated | Accepted by the manager, waiting to be settled |
+| Counted | Converted into leave days, final |
+| Reimbursed | Paid with the salary, final |
+
+---
+
+## How counting works
+
+When an overtime is counted:
+
+1. Its hours are added to the employee's pending hours.
+2. If the yearly reserve is not full yet, pending hours fill it first. The reserve restarts at zero each year.
+3. The remaining pending hours are converted into whole leave days, using the employee's hours per day.
+4. The days are added to the employee's balance for the leave type chosen in the setup.
+5. The hours that do not make a full day stay pending for the next count.
+
+The hours per day come from the employee's weekly hours divided by the days worked per week.
+
+Example: an employee works 27h per week over 3 days, so 9h per day. With a reserve of 10h, a first overtime of 25h fills the reserve (10h), gives 1 leave day (9h) and keeps 6h pending.
 
 ---
 
 ## Installation
 
-### Prerequisites
+Prerequisites:
 
 - Dolibarr >= 11.0
-- PHP >= 7.0
+- PHP >= 7.4
+- Leave module enabled
 
-### Module Installation
+Steps:
 
 1. Copy the `overtime` folder into `htdocs/custom/`
 2. Enable the module in **Setup > Modules > Human Resources**
+3. Open the module setup and save it once, even with the default values
+
+---
+
+## Setup
+
+In **Setup > Modules > Overtime**:
+
+| Setting | Description |
+|---------|-------------|
+| Hours to reserve | Hours per employee and per year that give neither leave nor pay. 0 disables the reserve |
+| Use native Dolibarr weekly hours | Take the hours per day from the weekly hours of the user card (recommended) |
+| Default days per week | Used when the user has no "days per week" value |
+| Extrafield for hours per day | Only when native weekly hours are disabled: user extrafield holding the hours per day |
+| Leave type | Leave type credited with the days obtained from overtime. Required for counting |
+
+For each employee, fill in the weekly hours on the user card (HR tab). For part-time employees, also fill in the "days per week" field, which the module creates on users.
 
 ---
 
 ## Usage
 
-### Access
-Menu: **HR > Overtime**
+Menu **HR > Overtime**:
 
-### Workflow
+- **List** / **New**: overtime records. Employees see their own overtime and the overtime of the people they manage
+- **Counted days**: the reserve used per employee and per year
+- **Kept hours**: the hours pending per employee, not yet converted into a leave day
 
-```
-DRAFT (0) → VALIDATED (1) → COUNTED (4) → REIMBURSED (7)
-                 ↓
-            CANCELED (9)
-```
+Permissions:
 
-### Available Pages
-
-| Page | Description |
-|------|-------------|
-| `overtimeindex.php` | Dashboard |
-| `overtime_list.php` | Overtime list |
-| `overtime_card.php` | Detailed card |
-| `overtimehourskeep_list.php` | Hours accumulation per employee |
-| `overtimedaycounted_list.php` | Day counting |
+| Permission | Allows |
+|------------|--------|
+| Change overtime status | Validate, count, reimburse and link payments |
+| View counted days | See the yearly reserves |
+| Create/modify counted days | Edit the yearly reserves |
+| Delete counted days | Delete the yearly reserves |
+| View kept hours | See the pending hours |
 
 ---
 
-## Architecture
+## Known issues
 
-### File Structure
-
-```
-overtime/
-├── class/
-│   ├── overtime.class.php              # Main object
-│   ├── overtimehourskeep.class.php     # Hours accumulation
-│   └── overtimedaycounted.class.php    # Day counting
-├── core/modules/
-│   └── modOvertime.class.php           # Module descriptor
-├── admin/
-│   ├── setup.php                       # Configuration
-│   └── about.php                       # About
-├── lib/
-│   ├── overtime.lib.php                # Common functions
-│   ├── overtime_overtime.lib.php       # Overtime object lib
-│   └── overtime_overtimedaycounted.lib.php
-├── sql/                                # Tables + triggers
-├── test/phpunit/
-│   └── OvertimeFunctionalTest.php      # Functional tests
-├── backport/v16/                       # Dolibarr 16 compatibility
-├── overtimeindex.php                   # Dashboard
-├── overtime_list.php                   # List
-├── overtime_card.php                   # Card
-├── overtimehourskeep_list.php          # Hours accumulation
-└── overtimedaycounted_list.php         # Day counting
-```
-
-### Business Objects
-
-#### `Overtime`
-Overtime record:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `rowid` | int | Technical ID |
-| `ref` | varchar | Unique reference |
-| `fk_user` | int | Employee concerned |
-| `date_overtime` | date | Overtime date |
-| `duration` | double | Duration in hours |
-| `status` | int | Status (0=draft, 1=validated, etc.) |
-| `note` | text | Comment |
-
-**Statuses:**
-- `STATUS_DRAFT` (0): Draft
-- `STATUS_VALIDATED` (1): Validated
-- `STATUS_DECOMPTED` (4): Counted
-- `STATUS_REMBOURSED` (7): Reimbursed
-- `STATUS_CANCELED` (9): Canceled
-
-#### `OvertimeHoursKeep`
-Hours accumulation per employee:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `fk_user` | int | Employee |
-| `total_hours` | double | Total accumulated hours |
-| `year` | int | Year |
-
-#### `OvertimeDayCounted`
-Day counting:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `fk_user` | int | Employee |
-| `date_counted` | date | Counted date |
-| `counted` | int | Number of days |
-
-### SQL Tables
-
-```
-llx_overtime_overtime           # Overtime records
-llx_overtime_overtimehourskeep  # Hours accumulation
-llx_overtime_overtimedaycounted # Day counting
-```
+Several bugs still prevent the module from working as described above (decimal hours, reserve, double counting, permissions). They are tracked in the GitHub issues of the repository.
 
 ---
 
-## Development
-
-### Running Tests
+## Tests
 
 ```bash
-cd htdocs/custom/overtime/test/phpunit
-phpunit OvertimeFunctionalTest.php
+phpunit test/phpunit/unit/
 ```
 
-### Dolibarr 16 Compatibility
-
-The `backport/v16/` folder contains necessary adaptations for Dolibarr 16.
-
-### Dolibarr Tables Used
-
-| Table | Usage |
-|-------|-------|
-| `llx_user` | Employees |
+The unit tests cover the hours per day calculation and the input validation.
 
 ---
 
 ## License
 
-GPLv3 - See COPYING file
+GPLv3 or (at your option) any later version. See file COPYING for more information.
