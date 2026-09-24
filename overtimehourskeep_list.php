@@ -200,9 +200,9 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 //	$permissiontoadd = 1;
 //	$permissiontodelete = 1;
 //}
-$permissiontoread = 1;
-$permissiontoadd = 1;
-$permissiontodelete = 1;
+$permissiontoread = $user->hasRight('overtime', 'overtimehourskeep', 'read');
+$permissiontoadd = 0;
+$permissiontodelete = 0;
 $permissiontochangestatus = $user->hasRight('overtime', 'overtime', 'status');
 
 // Security check (enable the most restrictive one)
@@ -257,8 +257,8 @@ if (empty($reshook)) {
 	}
 
 	// Mass actions
-	$objectclass = 'Overtime';
-	$objectlabel = 'Overtime';
+	$objectclass = 'OvertimeHoursKeep';
+	$objectlabel = 'OvertimeHoursKeep';
 	$uploaddir = $conf->overtime->dir_output;
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 
