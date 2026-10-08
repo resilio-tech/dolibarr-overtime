@@ -1294,11 +1294,12 @@ class OvertimeHoursKeep extends CommonObject
 		$r = $daycounted->fetchByUserAndYear($this->fk_user, $year);
 
 		if ($r <= 0) {
+			$daycounted->ref = $year.'-'.$this->fk_user;
 			$daycounted->fk_user = $this->fk_user;
 			$daycounted->year = $year;
 			$daycounted->dayreserve = 0;
 			$r = $daycounted->create($user);
-			if (!$r) {
+			if ($r <= 0) {
 				$this->error = $daycounted->error;
 				$this->errors = $daycounted->errors;
 				return 0;
@@ -1317,7 +1318,11 @@ class OvertimeHoursKeep extends CommonObject
 				$daycounted->dayreserve += $this->hourskeeped;
 				$this->hourskeeped = 0;
 			}
-			$daycounted->update($user);
+			if ($daycounted->update($user) <= 0) {
+				$this->error = $daycounted->error;
+				$this->errors = $daycounted->errors;
+				return 0;
+			}
 		}
 
 		$days_to_add = $calculator->calculateDaysFromOvertime($this->hourskeeped, $hours_per_day);
