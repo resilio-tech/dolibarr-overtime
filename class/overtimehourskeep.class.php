@@ -1219,8 +1219,9 @@ class OvertimeHoursKeep extends CommonObject
 			return 0;
 		}
 
-		if (empty($conf->global->OVERTIME_HOLIDAY_TYPE)) {
+		if (empty($conf->global->OVERTIME_HOLIDAY_TYPE) || $conf->global->OVERTIME_HOLIDAY_TYPE == 'none') {
 			$this->error = $langs->trans('OVERTIME_HOLIDAY_TYPE_Empty');
+			return 0;
 		}
 
 		// Get hours per day: prefer native Dolibarr weeklyhours, fallback to extrafield
