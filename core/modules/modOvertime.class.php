@@ -277,6 +277,11 @@ class modOvertime extends DolibarrModules
 		$this->rights[$r][4] = 'overtime';
 		$this->rights[$r][5] = 'status';
 		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (0 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'PermOvertimeReadAll';
+		$this->rights[$r][4] = 'overtime';
+		$this->rights[$r][5] = 'readall';
+		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', (1 * 10) + 0 + 1);
 		$this->rights[$r][1] = 'PermOvertimeDayCountedRead';
 		$this->rights[$r][4] = 'overtimedaycounted';

@@ -93,6 +93,7 @@ OvertimeStatusCanceled = Annulé
 # Permissions
 #
 PermOvertimeChangeStatus = Modifier le statut des heures supplémentaires
+PermOvertimeReadAll = Voir les heures supplémentaires de tous les salariés
 PermOvertimeDayCountedRead = Consulter les jours comptabilisés
 PermOvertimeDayCountedWrite = Créer/modifier les jours comptabilisés
 PermOvertimeDayCountedDelete = Supprimer les jours comptabilisés

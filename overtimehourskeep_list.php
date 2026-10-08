@@ -316,8 +316,7 @@ if ($object->ismultientitymanaged == 1) {
 	$sql .= " WHERE 1 = 1";
 }
 // RESTRICT RIGHTS
-if (empty($user->rights->overtime->readall) && empty($user->rights->overtime->lire_tous)
-	&& (empty($conf->global->MAIN_USE_ADVANCED_PERMS) || empty($user->rights->overtime->writeall_advance))) {
+if (empty($user->admin) && !$user->hasRight('overtime', 'overtime', 'readall')) {
 	$sql .= " AND t.fk_user IN (".$db->sanitize(join(',', $childids)).")\n";
 }
 

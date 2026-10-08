@@ -167,6 +167,9 @@ if (!isModEnabled("overtime")) {
 if (!$permissiontoread) {
 	accessforbidden();
 }
+if ($object->id > 0 && empty($user->admin) && !$user->hasRight('overtime', 'overtime', 'readall') && !in_array($object->fk_user, $childids)) {
+	accessforbidden();
+}
 
 
 /*
