@@ -32,4 +32,4 @@ CREATE TABLE llx_overtime_overtimehourskeep(
 	-- END MODULEBUILDER FIELDS
 ) ENGINE=innodb;
 
-ALTER TABLE llx_overtime_overtimehourskeep MODIFY hourskeeped float NOT NULL;
+ALTER TABLE llx_overtime_overtimehourskeep MODIFY hourskeeped double NOT NULL;

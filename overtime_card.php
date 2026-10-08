@@ -511,7 +511,7 @@ if ($action == 'create') {
 	print '<tr>';
 	print '<td class="fieldrequired">'.$langs->trans("Hours").'</td>';
 	print '<td>';
-	print '<input type="number" name="hours" value="'.$hours.'">';
+	print '<input type="number" step="any" name="hours" value="'.$hours.'">';
 	print '</td>';
 	print '</tr>';
 
@@ -573,7 +573,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '<tr>';
 	print '<td class="fieldrequired">'.$langs->trans("Hours").'</td>';
 	print '<td>';
-	print '<input type="number" name="hours" value="'.$object->hours.'">';
+	print '<input type="number" step="any" name="hours" value="'.$object->hours.'">';
 	print '</td>';
 	print '</tr>';
 
