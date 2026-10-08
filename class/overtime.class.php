@@ -1255,11 +1255,10 @@ class Overtime extends CommonObject
 		$resql = $this->db->query($sql);
 		if (!$resql) {
 			$this->error = $this->db->lasterror();
-			$this->db->rollback();
 			return -1;
 		}
 
-		$this->db->commit();
+		$this->status = $status;
 
 		return $this->id;
 	}
