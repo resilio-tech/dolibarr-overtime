@@ -302,6 +302,16 @@ class modOvertime extends DolibarrModules
 		$this->rights[$r][4] = 'overtimehourskeep';
 		$this->rights[$r][5] = 'read';
 		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 1 + 1);
+		$this->rights[$r][1] = 'PermOvertimeHoursKeepWrite';
+		$this->rights[$r][4] = 'overtimehourskeep';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', (2 * 10) + 2 + 1);
+		$this->rights[$r][1] = 'PermOvertimeHoursKeepDelete';
+		$this->rights[$r][4] = 'overtimehourskeep';
+		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		// Main menu entries to add
 		$this->menu = array();
