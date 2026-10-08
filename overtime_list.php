@@ -258,6 +258,14 @@ if (empty($reshook)) {
 		$massaction = ''; // Protection to avoid mass action if we force a new search during a mass action confirmation
 	}
 
+	if ($massaction == 'delete') {
+		$toselect = array_filter($toselect, function ($id) use ($db, $permissiontochangestatus) {
+			$o = new Overtime($db);
+			$o->fetch($id);
+			return $o->status == Overtime::STATUS_DRAFT || ($permissiontochangestatus && $o->status == Overtime::STATUS_VALIDATED);
+		});
+	}
+
 	// Mass actions
 	$objectclass = 'Overtime';
 	$objectlabel = 'Overtime';
@@ -609,7 +617,7 @@ if (!empty($permissiontochangestatus)) {
 	$arrayofmassactions['refunds'] = img_picto('', 'check', 'class="pictofixedwidth"').$langs->trans("Refunds_Overtime");
 	$arrayofmassactions['reverse'] = img_picto('', '', 'class="pictofixedwidth"').$langs->trans("Reverse_Overtime");
 }
-if (!empty($permissiontodelete) && ($object->status == $object::STATUS_DRAFT || $permissiontochangestatus && $object->status == $object::STATUS_VALIDATED)) {
+if (!empty($permissiontodelete)) {
 	$arrayofmassactions['predelete'] = img_picto('', 'delete', 'class="pictofixedwidth"').$langs->trans("Delete");
 }
 if (GETPOST('nomassaction', 'int') || in_array($massaction, array('presend', 'predelete'))) {

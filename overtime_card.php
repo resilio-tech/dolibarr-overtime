@@ -149,7 +149,7 @@ if ($enablepermissioncheck) {
 } else {
 	$permissiontoread = 1;
 	$permissiontoadd = 1; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
-	$permissiontodelete = isset($object->status) && $object->status == $object::STATUS_DRAFT;
+	$permissiontodelete = isset($object->status) && ($object->status == $object::STATUS_DRAFT || ($user->hasRight('overtime', 'overtime', 'status') && $object->status == $object::STATUS_VALIDATED));
 	$permissionnote = 1;
 	$permissiondellink = 1;
 }
@@ -259,7 +259,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'confirm_delete' && $confirm == 'yes') {
+	if ($action == 'confirm_delete' && $confirm == 'yes' && $permissiontodelete) {
 		$db->begin();
 
 		$result = $object->delete($user);
@@ -867,7 +867,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			if ($object->status == $object::STATUS_DRAFT || $permissiontochangestatus && $object->status == $object::STATUS_VALIDATED) {
 				// Delete
 				$params = array();
-				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken(), 'delete', $permissiontodelete || $permissiontochangestatus, $params);
+				print dolGetButtonAction('', $langs->trans("Delete"), 'delete', $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken(), 'delete', $permissiontodelete, $params);
 			}
 		}
 		print '</div>'."\n";
