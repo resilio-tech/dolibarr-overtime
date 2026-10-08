@@ -281,7 +281,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if ($action == 'update') {
+	if ($action == 'update' && ($object->status == Overtime::STATUS_DRAFT || ($permissiontochangestatus && $object->status == Overtime::STATUS_VALIDATED))) {
 		$object->date_start = $date_start;
 		$object->date_end = $date_end;
 		$object->hours = $hours;
@@ -290,7 +290,6 @@ if (empty($reshook)) {
 
 		$db->begin();
 
-		$object->status = 0;
 		$result = $object->update($user);
 
 		if ($result > 0) {
@@ -306,6 +305,13 @@ if (empty($reshook)) {
 				setEventMessages($object->error, null, 'errors');
 			}
 			$action = 'edit';
+		}
+	}
+
+	if ($action == 'confirm_cancelovertime' && $confirm == 'yes' && $permissiontochangestatus) {
+		$result = $object->cancel($user);
+		if ($result < 0) {
+			setEventMessages($object->error, $object->errors, 'errors');
 		}
 	}
 
@@ -625,6 +631,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 	if ($action == 'delete') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteOvertime'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
+	if ($action == 'cancelovertime') {
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('CancelOvertime'), $langs->trans('ConfirmCancelOvertime'), 'confirm_cancelovertime', '', 0, 1);
+	}
 	// Confirmation to delete line
 	if ($action == 'deleteline') {
 		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&lineid='.$lineid, $langs->trans('DeleteLine'), $langs->trans('ConfirmDeleteLine'), 'confirm_deleteline', '', 0, 1);
@@ -803,6 +812,9 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 					// Reopen
 					print dolGetButtonAction('', $langs->trans('Count_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=count&token=' . newToken(), '', $permissiontochangestatus);
 					print dolGetButtonAction('', $langs->trans('Refund_Overtime'), 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=refund&token=' . newToken(), '', $permissiontochangestatus);
+				}
+				if ($object->status == $object::STATUS_DRAFT || $object->status == $object::STATUS_VALIDATED) {
+					print dolGetButtonAction('', $langs->trans('CancelOvertime'), 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=cancelovertime&token='.newToken(), '', $permissiontochangestatus);
 				}
 				if ($object->status == $object::STATUS_REMBOURSED && $action != 'link') {
 					// Reopen

@@ -756,7 +756,7 @@ class Overtime extends CommonObject
 	public function cancel($user, $notrigger = 0)
 	{
 		// Protection
-		if ($this->status != self::STATUS_VALIDATED) {
+		if ($this->status != self::STATUS_DRAFT && $this->status != self::STATUS_VALIDATED) {
 			return 0;
 		}
 
@@ -1021,15 +1021,15 @@ class Overtime extends CommonObject
 			global $langs;
 			//$langs->load("overtime@overtime");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatus[self::STATUS_DECOMPTED] = $langs->transnoentitiesnoconv('Counted_Overtime');
 			$this->labelStatus[self::STATUS_REMBOURSED] = $langs->transnoentitiesnoconv('Refunded_Overtime');
-			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
+			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Canceled');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
+			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatusShort[self::STATUS_DECOMPTED] = $langs->transnoentitiesnoconv('Counted_Overtime');
 			$this->labelStatusShort[self::STATUS_REMBOURSED] = $langs->transnoentitiesnoconv('Refunded_Overtime');
-			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
+			$this->labelStatusShort[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Canceled');
 		}
 		$s = $status;
 		if (!in_array($status, array_keys($this->labelStatus))) {
