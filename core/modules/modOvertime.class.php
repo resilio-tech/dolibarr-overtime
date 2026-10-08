@@ -161,7 +161,11 @@ class modOvertime extends DolibarrModules
 		// Example: $this->const=array(1 => array('OVERTIME_MYNEWCONST1', 'chaine', 'myvalue', 'This is a constant to add', 1),
 		//                             2 => array('OVERTIME_MYNEWCONST2', 'chaine', 'myvalue', 'This is another constant to add', 0, 'current', 1)
 		// );
-		$this->const = array();
+		$this->const = array(
+			1 => array('OVERTIME_DAY_TO_RESERVE', 'chaine', '0', '', 0, 'current', 0),
+			2 => array('OVERTIME_USE_NATIVE_WEEKLYHOURS', 'chaine', '1', '', 0, 'current', 0),
+			3 => array('OVERTIME_DEFAULT_DAYS_PER_WEEK', 'chaine', '5', '', 0, 'current', 0),
+		);
 
 		// Some keys to add into the overwriting translation tables
 		/*$this->overwrite_translation = array(
